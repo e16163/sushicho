@@ -136,11 +136,39 @@ nav{display:flex}
 .rate-modal-loc{font-family:'DM Sans',sans-serif;font-size:10px;color:var(--g4);margin-bottom:2px;text-transform:uppercase;letter-spacing:.5px}
 .rate-modal-type{font-family:'DM Sans',sans-serif;font-size:12px;font-style:italic;color:var(--g3);margin-bottom:10px}
 .rate-modal-desc{font-family:'DM Sans',sans-serif;font-size:12.5px;color:var(--g2);line-height:1.7;border-left:3px solid var(--pink2);padding-left:11px;margin-bottom:14px}
-.ext-links{display:flex;gap:7px;margin-bottom:16px;flex-wrap:wrap}
-.ext-link{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;text-decoration:none;transition:opacity .12s;cursor:pointer}
-.ext-link:hover{opacity:.8}
+.ext-links{display:flex;gap:8px;margin-bottom:16px;flex-direction:column}
+.ext-link-row{display:flex;align-items:center;gap:8px}
+.ext-link{display:inline-flex;align-items:center;gap:5px;padding:6px 11px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;text-decoration:none;transition:all .12s;cursor:pointer;flex-shrink:0;white-space:nowrap}
+.ext-link:hover{opacity:.82;transform:translateY(-1px)}
 .ext-link-yelp{background:#fff0f0;color:#d32323;border:1px solid #f5c6c6}
 .ext-link-google{background:#f0f4fe;color:#3367d6;border:1px solid #c5d4f5}
+.ext-rating-pill{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;background:var(--g6);border:1px solid var(--border);min-width:0}
+.ext-rating-pill.yelp{background:#fff8f8;border-color:#f5c6c6}
+.ext-rating-pill.google{background:#f5f7fe;border-color:#c5d4f5}
+.ext-star{font-size:12px;line-height:1}
+.ext-star.yelp{color:#d32323}
+.ext-star.google{color:#f4a400}
+.ext-rating-val{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;line-height:1;color:var(--g1)}
+.ext-rating-ct{font-family:'DM Sans',sans-serif;font-size:11px;color:var(--g4);white-space:nowrap}
+.ext-rating-loading{display:flex;align-items:center;gap:3px;padding:0 2px}
+.ext-rating-loading span{width:4px;height:4px;border-radius:50%;background:var(--g4);animation:ldot .9s infinite ease-in-out both}
+.ext-rating-loading span:nth-child(2){animation-delay:.18s}
+.ext-rating-loading span:nth-child(3){animation-delay:.36s}
+@keyframes ldot{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+.ext-no-key{font-family:'DM Sans',sans-serif;font-size:11px;color:var(--g4);font-style:italic;cursor:pointer;text-decoration:underline;text-underline-offset:2px;padding:5px 2px}
+.ext-no-key:hover{color:var(--g1)}
+.settings-btn{background:none;border:1px solid var(--border);width:30px;height:30px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--g4);transition:all .12s;font-size:14px}
+.settings-btn:hover{border-color:var(--g3);color:var(--g1);background:var(--g6)}
+.settings-modal{background:var(--white);border-radius:12px;max-width:380px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.14);animation:popin .2s ease;position:relative;overflow:hidden}
+.key-status{display:flex;align-items:center;gap:7px;padding:8px 11px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;margin-bottom:13px}
+.key-status.set{background:#f0faf5;border:1px solid #b8e4cc;color:#2E7D5E}
+.key-status.unset{background:var(--pink);border:1px solid var(--rose);color:var(--red)}
+.key-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.key-dot.set{background:#2E7D5E}
+.key-dot.unset{background:var(--red)}
+.cache-info{font-family:'DM Sans',sans-serif;font-size:11px;color:var(--g4);margin-top:9px;display:flex;justify-content:space-between;align-items:center}
+.cache-clear-btn{background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:11px;color:var(--g4);text-decoration:underline;transition:color .12s;padding:0}
+.cache-clear-btn:hover{color:var(--red)}
 .modal-divider{height:1px;background:var(--border);margin:14px 0}
 .write-review-hd{font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--g3);margin-bottom:10px}
 .login-notice{background:var(--pink);border:1px solid var(--rose);border-radius:8px;padding:8px 11px;margin-bottom:12px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--red);line-height:1.5}
@@ -220,6 +248,7 @@ input[type=range].rng:disabled{opacity:.4;cursor:not-allowed}
       <input type="text" placeholder="Restaurant, city..." id="search-inp" oninput="onSearch()">
     </div>
     <div id="user-area"></div>
+    <button class="settings-btn" onclick="openSettings()" title="API key settings">⚙</button>
     <button class="add-btn" onclick="openAddModal()">+ Add</button>
   </div>
 </header>
@@ -374,6 +403,32 @@ input[type=range].rng:disabled{opacity:.4;cursor:not-allowed}
         <button class="btn-cancel" onclick="closeAddModal()">Cancel</button>
         <button class="btn-save" onclick="submitAdd()">Add to Database</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="overlay" id="settings-overlay" onclick="closeIfOutside(event,'settings-overlay')">
+  <div class="settings-modal">
+    <div class="modal-header">
+      <button class="modal-close" onclick="closeSettings()">x</button>
+      <div class="modal-title" style="font-size:18px">Live Ratings</div>
+      <div class="modal-sub">Fetch real Yelp &amp; Google scores via Anthropic API</div>
+    </div>
+    <div class="modal-body">
+      <div id="key-status-row"></div>
+      <div class="form-field">
+        <label class="form-label">Anthropic API Key</label>
+        <input class="form-inp" id="settings-apikey" type="password" placeholder="sk-ant-...">
+      </div>
+      <div style="font-family:'DM Sans',sans-serif;font-size:11px;color:var(--g4);line-height:1.6;margin-bottom:13px">
+        Your key is stored only in this browser (localStorage). Ratings are cached 24 hrs per restaurant to minimise API calls. The key is sent directly to <code style="background:var(--g6);padding:1px 4px;border-radius:3px">api.anthropic.com</code>.
+      </div>
+      <div class="cache-info">
+        <span id="cache-count-lbl"></span>
+        <button class="cache-clear-btn" onclick="clearRatingCache()">Clear cache</button>
+      </div>
+      <button class="btn-primary" style="margin-top:14px" onclick="saveApiKey()">Save Key</button>
     </div>
   </div>
 </div>
@@ -564,7 +619,100 @@ function makeTooltipContent(r,rat){const{avg,count}=getRestaurantStats(r.id);let
 function drawMap(){if(!leafletMap)return;const rats=getRatings(),list=getFiltered().filter(r=>r.lat&&r.lng),visIds=new Set(list.map(r=>String(r.id)));Object.keys(leafletMarkers).forEach(id=>{if(!visIds.has(id)){leafletMap.removeLayer(leafletMarkers[id]);delete leafletMarkers[id];}});list.forEach(r=>{const rat=rats[r.id],id=String(r.id),icon=makeMarkerIcon(r,rat);if(leafletMarkers[id]){leafletMarkers[id].setIcon(icon);leafletMarkers[id].setTooltipContent(makeTooltipContent(r,rat));}else{const m=L.marker([r.lat,r.lng],{icon,riseOnHover:true});m.bindTooltip(makeTooltipContent(r,rat),{className:'sushi-tooltip',direction:'top',offset:[0,-4],opacity:1});m.on('click',()=>openModal(r.id));m.addTo(leafletMap);leafletMarkers[id]=m;}});}
 function showMap(){if(!leafletMap){leafletMap=L.map('leaflet-map',{center:[35,-30],zoom:2});L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',subdomains:'abcd',maxZoom:19}).addTo(leafletMap);}setTimeout(()=>{leafletMap.invalidateSize();drawMap();},80);}
 
-// ── DISPLAY SWITCH ────────────────────────────────────────────────────────
+// ── API KEY & RATING CACHE ────────────────────────────────────────────────
+function getApiKey(){return localStorage.getItem('sc_apikey')||'';}
+function setApiKey(k){if(k)localStorage.setItem('sc_apikey',k);else localStorage.removeItem('sc_apikey');}
+const CACHE_TTL=24*60*60*1000; // 24h
+function getCachedRating(rid){
+  try{
+    const c=JSON.parse(localStorage.getItem('sc_xr_'+rid)||'null');
+    if(!c||Date.now()-new Date(c.at).getTime()>CACHE_TTL)return null;
+    return c.data;
+  }catch(e){return null;}
+}
+function setCachedRating(rid,data){localStorage.setItem('sc_xr_'+rid,JSON.stringify({data,at:new Date().toISOString()}));}
+function countCached(){return Object.keys(localStorage).filter(k=>k.startsWith('sc_xr_')).length;}
+function clearRatingCache(){Object.keys(localStorage).filter(k=>k.startsWith('sc_xr_')).forEach(k=>localStorage.removeItem(k));updateCacheCount();showToast('Rating cache cleared.');}
+function updateCacheCount(){const el=document.getElementById('cache-count-lbl');if(el)el.textContent=countCached()+' restaurants cached';}
+
+async function fetchExternalRatings(r){
+  const key=getApiKey();
+  if(!key)return null;
+  const cached=getCachedRating(r.id);
+  if(cached)return cached;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:300,
+        system:'You are a restaurant data assistant. Respond with ONLY valid JSON, no markdown, no explanation.',
+        tools:[{type:'web_search_20250305',name:'web_search'}],
+        messages:[{role:'user',content:`Find the current Yelp rating and review count, and Google Maps rating and review count, for the restaurant "${r.name}" in ${r.city}, ${r.country}. Return ONLY this JSON: {"yelp":{"rating":4.5,"reviews":234},"google":{"rating":4.7,"reviews":1823}}. Use null for any value you cannot find.`}]
+      })
+    });
+    const data=await res.json();
+    if(data.error)throw new Error(data.error.message);
+    const textBlock=data.content?.find(b=>b.type==='text');
+    if(!textBlock)return null;
+    const clean=textBlock.text.trim().replace(/^```json|^```|```$/gm,'').trim();
+    const ratings=JSON.parse(clean);
+    setCachedRating(r.id,ratings);
+    return ratings;
+  }catch(e){console.warn('fetchExternalRatings:',e);return null;}
+}
+
+const YELP_SVG=`<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M21.111 18.226c-.141.969-2.119 3.483-3.029 3.847-.311.124-.611.094-.85-.09-.154-.12-.314-.365-2.447-3.827l-.633-1.032c-.203-.312-.172-.76.091-1.094.266-.335.65-.47.984-.368l1.2.371c3.808 1.172 4.076 1.3 4.243 1.435.259.2.366.519.441.758zm-9.292-7.55c-.167-.366-.493-.581-.831-.553l-1.231.1c-3.965.315-4.241.369-4.428.461-.282.137-.426.427-.457.676-.053.383.906 3.375 1.547 4.2.213.272.518.392.822.329.201-.041.388-.156 2.925-2.682l.838-.849c.265-.266.311-.718.145-1.082l-.33-.6zm3.636-5.89c-.087-.959-1.725-3.726-2.573-4.203-.286-.16-.595-.178-.854-.047-.169.086-.356.264-1.758 3.535l-.474 1.095c-.152.347-.048.789.269 1.076.313.287.713.351 1.032.184l1.12-.585c3.397-1.781 3.644-1.936 3.793-2.088.223-.23.285-.574.445-.967zm6.437 5.97c-.127-.27-.371-.448-2.968-1.365l-1.177-.417c-.37-.129-.784.014-1.016.358-.233.345-.226.784.02 1.096l.746.965c2.419 3.127 2.613 3.342 2.786 3.448.254.158.558.139.826-.013.406-.225 1.622-3.089 1.489-3.893l-.706-.179zm-12.238 6.18c.28.12.596.075.844-.123.162-.131.321-.37 1.498-3.871l.369-1.117c.119-.357-.002-.773-.308-1.036-.308-.264-.714-.32-1.04-.15l-1.082.566c-3.461 1.806-3.698 1.96-3.84 2.116-.208.227-.256.556-.186.822.118.419 2.428 2.667 3.745 2.793z"/></svg>`;
+const GMAP_SVG=`<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`;
+
+function ratingPill(platform,data,loading){
+  if(loading){
+    return`<div class="ext-rating-pill ${platform}"><div class="ext-rating-loading"><span></span><span></span><span></span></div></div>`;
+  }
+  if(!data||data.rating===null){
+    return`<div class="ext-rating-pill ${platform}" style="color:var(--g4);font-size:11px;font-style:italic">not found</div>`;
+  }
+  return`<div class="ext-rating-pill ${platform}">
+    <span class="ext-star ${platform}">★</span>
+    <span class="ext-rating-val">${data.rating}</span>
+    <span class="ext-rating-ct">${fmtN(data.reviews)} reviews</span>
+  </div>`;
+}
+function renderExtLinks(r,ratings,loading){
+  const hasKey=!!getApiKey();
+  const noKeyHint=!hasKey?`<span class="ext-no-key" onclick="openSettings()">add key for live ratings</span>`:'';
+  return`
+    <div class="ext-link-row">
+      <a class="ext-link ext-link-yelp" href="${yelpUrl(r)}" target="_blank" rel="noopener">${YELP_SVG} Yelp ↗</a>
+      ${hasKey?ratingPill('yelp',ratings?.yelp,loading):noKeyHint}
+    </div>
+    <div class="ext-link-row">
+      <a class="ext-link ext-link-google" href="${googleUrl(r)}" target="_blank" rel="noopener">${GMAP_SVG} Google Maps ↗</a>
+      ${hasKey?ratingPill('google',ratings?.google,loading):''}
+    </div>`;
+}
+
+// ── SETTINGS MODAL ────────────────────────────────────────────────────────
+function openSettings(){
+  const key=getApiKey();
+  document.getElementById('settings-apikey').value=key?'sk-ant-••••••••••••••••':'';
+  document.getElementById('settings-apikey').placeholder=key?'(key set — paste to replace)':'sk-ant-...';
+  const row=document.getElementById('key-status-row');
+  row.innerHTML=key
+    ?`<div class="key-status set"><div class="key-dot set"></div>API key configured — live ratings enabled</div>`
+    :`<div class="key-status unset"><div class="key-dot unset"></div>No API key — ratings will not be fetched</div>`;
+  updateCacheCount();
+  document.getElementById('settings-overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeSettings(){document.getElementById('settings-overlay').classList.remove('open');document.body.style.overflow='';}
+function saveApiKey(){
+  const val=document.getElementById('settings-apikey').value.trim();
+  if(val&&!val.startsWith('sk-ant-••')){setApiKey(val);showToast('API key saved.');} 
+  else if(!val){setApiKey('');showToast('API key removed.');}
+  closeSettings();
+}
 function switchDisplay(mode){st.display=mode;const ge=document.getElementById('view-grid'),me=document.getElementById('view-map');if(mode==='map'){ge.style.display='none';me.style.display='block';showMap();}else{me.style.display='none';ge.style.display='block';}document.getElementById('vt-grid').classList.toggle('active',mode==='grid');document.getElementById('vt-map').classList.toggle('active',mode==='map');document.getElementById('btn-grid').classList.toggle('active',mode==='grid');document.getElementById('btn-map').classList.toggle('active',mode==='map');}
 function showView(v){switchDisplay(v==='map'?'map':'grid');}
 function setFilter(f,btn){st.filter=f;document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderCards();if(st.display==='map')drawMap();}
@@ -583,9 +731,15 @@ function openModal(id){
   document.getElementById('m-loc').textContent=[r.area,r.city,r.country,r.price,r.m?mStars(r.m)+' Michelin':null].filter(Boolean).join(' · ');
   document.getElementById('m-type').textContent=r.type;
   document.getElementById('m-desc').textContent=r.desc||'';
-  document.getElementById('m-ext-links').innerHTML=
-    `<a class="ext-link ext-link-yelp" href="${yelpUrl(r)}" target="_blank" rel="noopener"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M21.111 18.226c-.141.969-2.119 3.483-3.029 3.847-.311.124-.611.094-.85-.09-.154-.12-.314-.365-2.447-3.827l-.633-1.032c-.203-.312-.172-.76.091-1.094.266-.335.65-.47.984-.368l1.2.371c3.808 1.172 4.076 1.3 4.243 1.435.259.2.366.519.441.758zm-9.292-7.55c-.167-.366-.493-.581-.831-.553l-1.231.1c-3.965.315-4.241.369-4.428.461-.282.137-.426.427-.457.676-.053.383.906 3.375 1.547 4.2.213.272.518.392.822.329.201-.041.388-.156 2.925-2.682l.838-.849c.265-.266.311-.718.145-1.082l-.33-.6zm3.636-5.89c-.087-.959-1.725-3.726-2.573-4.203-.286-.16-.595-.178-.854-.047-.169.086-.356.264-1.758 3.535l-.474 1.095c-.152.347-.048.789.269 1.076.313.287.713.351 1.032.184l1.12-.585c3.397-1.781 3.644-1.936 3.793-2.088.223-.23.285-.574.445-.967zm6.437 5.97c-.127-.27-.371-.448-2.968-1.365l-1.177-.417c-.37-.129-.784.014-1.016.358-.233.345-.226.784.02 1.096l.746.965c2.419 3.127 2.613 3.342 2.786 3.448.254.158.558.139.826-.013.406-.225 1.622-3.089 1.489-3.893l-.706-.179zm-12.238 6.18c.28.12.596.075.844-.123.162-.131.321-.37 1.498-3.871l.369-1.117c.119-.357-.002-.773-.308-1.036-.308-.264-.714-.32-1.04-.15l-1.082.566c-3.461 1.806-3.698 1.96-3.84 2.116-.208.227-.256.556-.186.822.118.419 2.428 2.667 3.745 2.793z"/></svg> Yelp</a>
-     <a class="ext-link ext-link-google" href="${googleUrl(r)}" target="_blank" rel="noopener"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Google Maps</a>`;
+  // Show buttons immediately; show loading dots if key is set, then fetch
+  document.getElementById('m-ext-links').innerHTML=renderExtLinks(r,null,!!getApiKey());
+  fetchExternalRatings(r).then(ratings=>{
+    if(ratings!==null&&String(st.activeId)===String(id)){
+      document.getElementById('m-ext-links').innerHTML=renderExtLinks(r,ratings,false);
+    } else if(ratings===null&&String(st.activeId)===String(id)&&getApiKey()){
+      document.getElementById('m-ext-links').innerHTML=renderExtLinks(r,null,false);
+    }
+  });
   document.getElementById('m-write-hd').textContent=myReview?'Update Your Review':'Write a Review';
   const notice=document.getElementById('m-login-notice');
   notice.innerHTML=!user?`<div class="login-notice"><a onclick="closeModal();openLogin()">Sign in</a> to write and save your review.</div>`:'';
@@ -641,7 +795,7 @@ function openAddModal(){document.getElementById('add-overlay').classList.add('op
 function closeAddModal(){document.getElementById('add-overlay').classList.remove('open');document.body.style.overflow='';}
 function submitAdd(){const name=document.getElementById('f-name').value.trim(),city=document.getElementById('f-city').value.trim(),country=document.getElementById('f-country').value,type=document.getElementById('f-type').value,price=document.getElementById('f-price').value;if(!name||!city||!country||!type||!price){alert('Please fill in all required fields.');return;}const newR={id:'c_'+Date.now(),name,city,country,area:document.getElementById('f-area').value.trim(),type,price,m:parseInt(document.getElementById('f-michelin').value)||0,desc:document.getElementById('f-desc').value.trim(),img:document.getElementById('f-img').value.trim()||null,lat:parseFloat(document.getElementById('f-lat').value)||null,lng:parseFloat(document.getElementById('f-lng').value)||null,isCustom:true};const list=getCustom();list.push(newR);saveCustom(list);closeAddModal();['f-name','f-city','f-area','f-desc','f-lat','f-lng','f-img'].forEach(id=>document.getElementById(id).value='');['f-country','f-type','f-price'].forEach(id=>document.getElementById(id).value='');document.getElementById('f-michelin').value='0';renderCards();renderSidePanel();showToast(name+' added!');}
 
-function closeIfOutside(e,id){if(e.target.id===id){if(id==='rate-overlay')closeModal();else if(id==='add-overlay')closeAddModal();else if(id==='auth-overlay')closeAuthModal();}}
+function closeIfOutside(e,id){if(e.target.id===id){if(id==='rate-overlay')closeModal();else if(id==='add-overlay')closeAddModal();else if(id==='auth-overlay')closeAuthModal();else if(id==='settings-overlay')closeSettings();}}
 function showToast(msg){document.querySelectorAll('.toast').forEach(t=>t.remove());const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3200);}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeAddModal();closeAuthModal();}if(e.key==='Enter'){const ao=document.getElementById('auth-overlay');if(ao.classList.contains('open')){if(document.getElementById('au-pass2'))doRegister();else doLogin();}}});
 window.addEventListener('resize',()=>{if(st.display==='map'&&leafletMap)leafletMap.invalidateSize();});
