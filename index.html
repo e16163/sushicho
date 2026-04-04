@@ -619,50 +619,67 @@ function makeTooltipContent(r,rat){const{avg,count}=getRestaurantStats(r.id);let
 function drawMap(){if(!leafletMap)return;const rats=getRatings(),list=getFiltered().filter(r=>r.lat&&r.lng),visIds=new Set(list.map(r=>String(r.id)));Object.keys(leafletMarkers).forEach(id=>{if(!visIds.has(id)){leafletMap.removeLayer(leafletMarkers[id]);delete leafletMarkers[id];}});list.forEach(r=>{const rat=rats[r.id],id=String(r.id),icon=makeMarkerIcon(r,rat);if(leafletMarkers[id]){leafletMarkers[id].setIcon(icon);leafletMarkers[id].setTooltipContent(makeTooltipContent(r,rat));}else{const m=L.marker([r.lat,r.lng],{icon,riseOnHover:true});m.bindTooltip(makeTooltipContent(r,rat),{className:'sushi-tooltip',direction:'top',offset:[0,-4],opacity:1});m.on('click',()=>openModal(r.id));m.addTo(leafletMap);leafletMarkers[id]=m;}});}
 function showMap(){if(!leafletMap){leafletMap=L.map('leaflet-map',{center:[35,-30],zoom:2});L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',subdomains:'abcd',maxZoom:19}).addTo(leafletMap);}setTimeout(()=>{leafletMap.invalidateSize();drawMap();},80);}
 
-// ── API KEY & RATING CACHE ────────────────────────────────────────────────
-function getApiKey(){return localStorage.getItem('sc_apikey')||'';}
-function setApiKey(k){if(k)localStorage.setItem('sc_apikey',k);else localStorage.removeItem('sc_apikey');}
-const CACHE_TTL=24*60*60*1000; // 24h
-function getCachedRating(rid){
-  try{
-    const c=JSON.parse(localStorage.getItem('sc_xr_'+rid)||'null');
-    if(!c||Date.now()-new Date(c.at).getTime()>CACHE_TTL)return null;
-    return c.data;
-  }catch(e){return null;}
-}
-function setCachedRating(rid,data){localStorage.setItem('sc_xr_'+rid,JSON.stringify({data,at:new Date().toISOString()}));}
-function countCached(){return Object.keys(localStorage).filter(k=>k.startsWith('sc_xr_')).length;}
-function clearRatingCache(){Object.keys(localStorage).filter(k=>k.startsWith('sc_xr_')).forEach(k=>localStorage.removeItem(k));updateCacheCount();showToast('Rating cache cleared.');}
-function updateCacheCount(){const el=document.getElementById('cache-count-lbl');if(el)el.textContent=countCached()+' restaurants cached';}
+// ── RATING CACHE ──────────────────────────────────────────────────────────
+const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
-async function fetchExternalRatings(r){
-  const key=getApiKey();
-  if(!key)return null;
-  const cached=getCachedRating(r.id);
-  if(cached)return cached;
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:300,
-        system:'You are a restaurant data assistant. Respond with ONLY valid JSON, no markdown, no explanation.',
-        tools:[{type:'web_search_20250305',name:'web_search'}],
-        messages:[{role:'user',content:`Find the current Yelp rating and review count, and Google Maps rating and review count, for the restaurant "${r.name}" in ${r.city}, ${r.country}. Return ONLY this JSON: {"yelp":{"rating":4.5,"reviews":234},"google":{"rating":4.7,"reviews":1823}}. Use null for any value you cannot find.`}]
+function getCachedRating(rid) {
+  try {
+    const c = JSON.parse(localStorage.getItem('sc_xr_' + rid) || 'null');
+    if (!c || Date.now() - new Date(c.at).getTime() > CACHE_TTL) return null;
+    return c.data;
+  } catch (e) { return null; }
+}
+
+function setCachedRating(rid, data) {
+  localStorage.setItem('sc_xr_' + rid, JSON.stringify({ data, at: new Date().toISOString() }));
+}
+
+function countCached() { 
+  return Object.keys(localStorage).filter(k => k.startsWith('sc_xr_')).length; 
+}
+
+function clearRatingCache() {
+  Object.keys(localStorage).filter(k => k.startsWith('sc_xr_')).forEach(k => localStorage.removeItem(k));
+  updateCacheCount();
+  if (typeof showToast === 'function') showToast('Rating cache cleared.');
+}
+
+function updateCacheCount() {
+  const el = document.getElementById('cache-count-lbl');
+  if (el) el.textContent = countCached() + ' restaurants cached';
+}
+
+// ── FETCH RATINGS (Calling your Vercel Proxy) ─────────────────────────────
+async function fetchExternalRatings(r) {
+  // 1. Check local cache first
+  const cached = getCachedRating(r.id);
+  if (cached) return cached;
+
+  try {
+    // 2. Call your internal API route
+    const res = await fetch('/api/key-api', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        name: r.name, 
+        city: r.city, 
+        country: r.country 
       })
     });
-    const data=await res.json();
-    if(data.error)throw new Error(data.error.message);
-    const textBlock=data.content?.find(b=>b.type==='text');
-    if(!textBlock)return null;
-    const clean=textBlock.text.trim().replace(/^```json|^```|```$/gm,'').trim();
-    const ratings=JSON.parse(clean);
-    setCachedRating(r.id,ratings);
-    return ratings;
-  }catch(e){console.warn('fetchExternalRatings:',e);return null;}
-}
 
+    if (!res.ok) throw new Error('API request failed');
+
+    const ratings = await res.json();
+
+    // 3. Store in cache and return
+    setCachedRating(r.id, ratings);
+    return ratings;
+
+  } catch (e) {
+    console.warn('fetchExternalRatings:', e);
+    return null;
+  }
+}
 const YELP_SVG=`<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M21.111 18.226c-.141.969-2.119 3.483-3.029 3.847-.311.124-.611.094-.85-.09-.154-.12-.314-.365-2.447-3.827l-.633-1.032c-.203-.312-.172-.76.091-1.094.266-.335.65-.47.984-.368l1.2.371c3.808 1.172 4.076 1.3 4.243 1.435.259.2.366.519.441.758zm-9.292-7.55c-.167-.366-.493-.581-.831-.553l-1.231.1c-3.965.315-4.241.369-4.428.461-.282.137-.426.427-.457.676-.053.383.906 3.375 1.547 4.2.213.272.518.392.822.329.201-.041.388-.156 2.925-2.682l.838-.849c.265-.266.311-.718.145-1.082l-.33-.6zm3.636-5.89c-.087-.959-1.725-3.726-2.573-4.203-.286-.16-.595-.178-.854-.047-.169.086-.356.264-1.758 3.535l-.474 1.095c-.152.347-.048.789.269 1.076.313.287.713.351 1.032.184l1.12-.585c3.397-1.781 3.644-1.936 3.793-2.088.223-.23.285-.574.445-.967zm6.437 5.97c-.127-.27-.371-.448-2.968-1.365l-1.177-.417c-.37-.129-.784.014-1.016.358-.233.345-.226.784.02 1.096l.746.965c2.419 3.127 2.613 3.342 2.786 3.448.254.158.558.139.826-.013.406-.225 1.622-3.089 1.489-3.893l-.706-.179zm-12.238 6.18c.28.12.596.075.844-.123.162-.131.321-.37 1.498-3.871l.369-1.117c.119-.357-.002-.773-.308-1.036-.308-.264-.714-.32-1.04-.15l-1.082.566c-3.461 1.806-3.698 1.96-3.84 2.116-.208.227-.256.556-.186.822.118.419 2.428 2.667 3.745 2.793z"/></svg>`;
 const GMAP_SVG=`<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`;
 
