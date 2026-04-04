@@ -407,31 +407,6 @@ input[type=range].rng:disabled{opacity:.4;cursor:not-allowed}
   </div>
 </div>
 
-<!-- Settings Modal -->
-<div class="overlay" id="settings-overlay" onclick="closeIfOutside(event,'settings-overlay')">
-  <div class="settings-modal">
-    <div class="modal-header">
-      <button class="modal-close" onclick="closeSettings()">x</button>
-      <div class="modal-title" style="font-size:18px">Live Ratings</div>
-      <div class="modal-sub">Fetch real Yelp &amp; Google scores via Anthropic API</div>
-    </div>
-    <div class="modal-body">
-      <div id="key-status-row"></div>
-      <div class="form-field">
-        <label class="form-label">Anthropic API Key</label>
-        <input class="form-inp" id="settings-apikey" type="password" placeholder="sk-ant-...">
-      </div>
-      <div style="font-family:'DM Sans',sans-serif;font-size:11px;color:var(--g4);line-height:1.6;margin-bottom:13px">
-        Your key is stored only in this browser (localStorage). Ratings are cached 24 hrs per restaurant to minimise API calls. The key is sent directly to <code style="background:var(--g6);padding:1px 4px;border-radius:3px">api.anthropic.com</code>.
-      </div>
-      <div class="cache-info">
-        <span id="cache-count-lbl"></span>
-        <button class="cache-clear-btn" onclick="clearRatingCache()">Clear cache</button>
-      </div>
-      <button class="btn-primary" style="margin-top:14px" onclick="saveApiKey()">Save Key</button>
-    </div>
-  </div>
-</div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
@@ -709,31 +684,7 @@ function renderExtLinks(r, ratings, loading) {
     </div>`;
 }
 
-// ── SETTINGS MODAL ────────────────────────────────────────────────────────
-function openSettings(){
-  const key=getApiKey();
-  document.getElementById('settings-apikey').value=key?'sk-ant-••••••••••••••••':'';
-  document.getElementById('settings-apikey').placeholder=key?'(key set — paste to replace)':'sk-ant-...';
-  const row=document.getElementById('key-status-row');
-  row.innerHTML=key
-    ?`<div class="key-status set"><div class="key-dot set"></div>API key configured — live ratings enabled</div>`
-    :`<div class="key-status unset"><div class="key-dot unset"></div>No API key — ratings will not be fetched</div>`;
-  updateCacheCount();
-  document.getElementById('settings-overlay').classList.add('open');
-  document.body.style.overflow='hidden';
-}
-function closeSettings(){document.getElementById('settings-overlay').classList.remove('open');document.body.style.overflow='';}
-function saveApiKey(){
-  const val=document.getElementById('settings-apikey').value.trim();
-  if(val&&!val.startsWith('sk-ant-••')){setApiKey(val);showToast('API key saved.');} 
-  else if(!val){setApiKey('');showToast('API key removed.');}
-  closeSettings();
-}
-function switchDisplay(mode){st.display=mode;const ge=document.getElementById('view-grid'),me=document.getElementById('view-map');if(mode==='map'){ge.style.display='none';me.style.display='block';showMap();}else{me.style.display='none';ge.style.display='block';}document.getElementById('vt-grid').classList.toggle('active',mode==='grid');document.getElementById('vt-map').classList.toggle('active',mode==='map');document.getElementById('btn-grid').classList.toggle('active',mode==='grid');document.getElementById('btn-map').classList.toggle('active',mode==='map');}
-function showView(v){switchDisplay(v==='map'?'map':'grid');}
-function setFilter(f,btn){st.filter=f;document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderCards();if(st.display==='map')drawMap();}
-function setSort(v){st.sort=v;renderCards();if(st.display==='map')drawMap();}
-function onSearch(){st.search=document.getElementById('search-inp').value;renderCards();if(st.display==='map')drawMap();}
+
 
 // ── REVIEW MODAL ──────────────────────────────────────────────────────────
 function openModal(id){
