@@ -6,6 +6,7 @@
 <title>Sushicho · 鮨帖</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
 :root{--white:#FAFAFA;--cream:#FFF5F5;--red:#C0392B;--red2:#E74C3C;--pink:#FDE8E8;--pink2:#FAD4D4;--rose:#F0BABA;--g1:#111111;--g2:#333333;--g3:#666666;--g4:#999999;--g5:#CCCCCC;--g6:#F0EDED;--border:#E5DADA}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -76,22 +77,17 @@ nav{display:flex;gap:0}
 
 /* MAP */
 #view-map{display:none}
-.map-container{position:relative;width:100%;height:calc(100vh - 52px - 48px);min-height:400px;background:#dde8f0;overflow:hidden;cursor:grab;user-select:none}
-.map-container:active{cursor:grabbing}
-#map-canvas{display:block}
-.map-tip{position:absolute;pointer-events:none;background:white;border:1px solid var(--border);border-radius:10px;padding:12px 14px;box-shadow:0 8px 24px rgba(0,0,0,.12);min-width:195px;max-width:240px;z-index:100;display:none}
-.map-tip-name{font-family:'Playfair Display',serif;font-size:14px;font-weight:600;color:var(--g1);margin-bottom:2px}
-.map-tip-meta{font-family:'DM Sans',sans-serif;font-size:11px;color:var(--g3);margin-bottom:4px}
-.map-tip-rating{font-family:'DM Sans',sans-serif;font-size:12px;color:var(--red);font-weight:500;margin-bottom:8px}
-.map-tip-btn{background:var(--red);color:white;border:none;padding:5px 13px;border-radius:20px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;pointer-events:all}
-.map-tip-btn:hover{background:var(--red2)}
-.map-controls{position:absolute;bottom:16px;right:16px;display:flex;flex-direction:column;gap:4px;z-index:50}
-.map-ctrl-btn{width:32px;height:32px;background:white;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:16px;font-weight:400;color:var(--g1);display:flex;align-items:center;justify-content:center;transition:all .12s;box-shadow:0 2px 8px rgba(0,0,0,.08)}
-.map-ctrl-btn:hover{background:var(--g6)}
-.map-legend{position:absolute;bottom:16px;left:16px;background:white;border:1px solid var(--border);border-radius:8px;padding:10px 13px;font-family:'DM Sans',sans-serif;font-size:11px;color:var(--g3);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+#leaflet-map{width:100%;height:calc(100vh - 52px - 48px);min-height:400px;z-index:1}
+.map-legend{position:absolute;bottom:28px;left:10px;background:white;border:1px solid var(--border);border-radius:8px;padding:10px 13px;font-family:'DM Sans',sans-serif;font-size:11px;color:var(--g3);box-shadow:0 2px 8px rgba(0,0,0,.08);z-index:999}
 .map-legend-item{display:flex;align-items:center;gap:7px;margin-bottom:4px}
 .map-legend-item:last-child{margin-bottom:0}
 .legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+/* Custom Leaflet tooltip */
+.sushi-tooltip{font-family:'DM Sans',sans-serif;font-size:12px;line-height:1.5;border:1px solid var(--border)!important;border-radius:8px!important;padding:9px 12px!important;box-shadow:0 6px 20px rgba(0,0,0,.12)!important;background:white!important;color:var(--g1)!important;pointer-events:none}
+.sushi-tooltip .t-name{font-family:'Playfair Display',serif;font-size:14px;font-weight:600;margin-bottom:2px}
+.sushi-tooltip .t-meta{color:var(--g4);font-size:11px;margin-bottom:3px}
+.sushi-tooltip .t-rating{color:var(--red);font-size:12px;font-weight:500}
+.leaflet-tooltip.sushi-tooltip::before{display:none}
 
 /* SIDE */
 .side-panel{position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;background:var(--white)}
@@ -248,26 +244,13 @@ input[type=range].rng::-webkit-slider-thumb:hover{transform:scale(1.2)}
       <div class="empty" id="empty-state" style="display:none">No restaurants found.</div>
     </div>
 
-    <div id="view-map" style="display:none">
-      <div class="map-container" id="map-container">
-        <canvas id="map-canvas"></canvas>
-        <div class="map-tip" id="map-tip">
-          <div class="map-tip-name"   id="tip-name"></div>
-          <div class="map-tip-meta"   id="tip-meta"></div>
-          <div class="map-tip-rating" id="tip-rating"></div>
-          <button class="map-tip-btn" id="tip-btn">Rate this counter</button>
-        </div>
-        <div class="map-controls">
-          <button class="map-ctrl-btn" onclick="mapZoom(1.25)">+</button>
-          <button class="map-ctrl-btn" onclick="mapZoom(0.8)">-</button>
-          <button class="map-ctrl-btn" onclick="mapReset()" style="font-size:10px;letter-spacing:-.3px">Reset</button>
-        </div>
-        <div class="map-legend">
-          <div class="map-legend-item"><div class="legend-dot" style="background:#C0392B"></div>Japan</div>
-          <div class="map-legend-item"><div class="legend-dot" style="background:#1a5c3a"></div>N. America</div>
-          <div class="map-legend-item"><div class="legend-dot" style="background:white;border:1.5px solid #C0392B"></div>Not rated</div>
-          <div class="map-legend-item"><div class="legend-dot" style="background:#C0392B"></div>Rated (score inside)</div>
-        </div>
+    <div id="view-map" style="display:none;position:relative">
+      <div id="leaflet-map"></div>
+      <div class="map-legend">
+        <div class="map-legend-item"><div class="legend-dot" style="background:#C0392B"></div>Japan</div>
+        <div class="map-legend-item"><div class="legend-dot" style="background:#1a5c3a"></div>N. America</div>
+        <div class="map-legend-item"><div class="legend-dot" style="background:white;border:1.5px solid #999"></div>Not rated</div>
+        <div class="map-legend-item"><div class="legend-dot" style="background:#C0392B"></div>Rated (score inside)</div>
       </div>
     </div>
   </div>
@@ -388,6 +371,7 @@ input[type=range].rng::-webkit-slider-thumb:hover{transform:scale(1.2)}
   </div>
 </div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 // ── IMAGES ────────────────────────────────────────────────────────────────
 const SUSHI_IMGS=[
@@ -646,198 +630,97 @@ function renderSidePanel(){
   } else {topSec.style.display='none';}
 }
 
-// ── CANVAS MAP ────────────────────────────────────────────────────────────
-// Web Mercator projection
-function mercX(lng,scale,ox){return(lng+180)/360*scale+ox;}
-function mercY(lat,scale,oy){
-  const r=lat*Math.PI/180;
-  return scale*(Math.PI-Math.log(Math.tan(Math.PI/4+r/2)))/(2*Math.PI)+oy;
-}
+// ── LEAFLET MAP ───────────────────────────────────────────────────────────
+let leafletMap = null;
+let leafletMarkers = {};
 
-let MP={scale:0,ox:0,oy:0,drag:false,lx:0,ly:0,hovId:null,tipId:null};
-
-function mapInit(w,h){
-  MP.scale=w*0.95;MP.ox=w*0.025;
-  const clat=30,r=clat*Math.PI/180;
-  MP.oy=h/2-MP.scale*(Math.PI-Math.log(Math.tan(Math.PI/4+r/2)))/(2*Math.PI);
-}
-
-function rXY(r){return{x:mercX(r.lng,MP.scale,MP.ox),y:mercY(r.lat,MP.scale,MP.oy)};}
-
-function drawMap(){
-  const cv=document.getElementById('map-canvas');
-  const mc=document.getElementById('map-container');
-  if(!cv||!mc)return;
-  const w=mc.clientWidth,h=mc.clientHeight;
-  cv.width=w;cv.height=h;
-  const ctx=cv.getContext('2d');
-  ctx.fillStyle='#c8dce8';ctx.fillRect(0,0,w,h);
-  drawLand(ctx);
-  // Graticule
-  ctx.strokeStyle='rgba(255,255,255,0.18)';ctx.lineWidth=0.5;
-  for(let lng=-180;lng<=180;lng+=30){
-    ctx.beginPath();let first=true;
-    for(let lat=-80;lat<=85;lat+=3){
-      const x=mercX(lng,MP.scale,MP.ox),y=mercY(lat,MP.scale,MP.oy);
-      first?ctx.moveTo(x,y):ctx.lineTo(x,y);first=false;
-    }ctx.stroke();
+function makeMarkerIcon(r, rat) {
+  const isJ = r.region === 'japan';
+  const col = isJ ? '#C0392B' : '#1a5c3a';
+  const size = rat ? 24 : 14;
+  const half = size / 2;
+  let inner;
+  if (rat) {
+    inner = `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${col};display:flex;align-items:center;justify-content:center;color:white;font-size:9px;font-weight:700;font-family:'DM Sans',sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.3);cursor:pointer">${rat}</div>`;
+  } else {
+    inner = `<div style="width:${size}px;height:${size}px;border-radius:50%;background:white;border:2px solid ${col};box-shadow:0 2px 6px rgba(0,0,0,.2);cursor:pointer"></div>`;
   }
-  for(let lat=-60;lat<=80;lat+=30){
-    ctx.beginPath();ctx.moveTo(0,mercY(lat,MP.scale,MP.oy));ctx.lineTo(w,mercY(lat,MP.scale,MP.oy));ctx.stroke();
-  }
-  // Dots
-  const rats=getRatings(),list=getFiltered().filter(r=>r.lat&&r.lng);
-  list.forEach(r=>{
-    const{x,y}=rXY(r);
-    if(x<-20||x>w+20||y<-20||y>h+20)return;
-    const rat=rats[r.id],isJ=r.region==='japan',col=isJ?'#C0392B':'#1a5c3a',hov=MP.hovId===r.id;
-    const radius=hov?11:(rat?8:6);
-    ctx.save();
-    if(hov){ctx.shadowColor=col;ctx.shadowBlur=14;}
-    ctx.beginPath();ctx.arc(x,y,radius,0,Math.PI*2);
-    ctx.fillStyle=rat?col:'rgba(255,255,255,0.9)';ctx.fill();
-    ctx.strokeStyle=col;ctx.lineWidth=rat?0:1.8;ctx.stroke();
-    if(rat){
-      ctx.fillStyle='white';ctx.font='bold 7px sans-serif';
-      ctx.textAlign='center';ctx.textBaseline='middle';
-      ctx.fillText(rat,x,y);
-    }
-    ctx.restore();
+  return L.divIcon({
+    className: '',
+    html: inner,
+    iconSize: [size, size],
+    iconAnchor: [half, half],
+    tooltipAnchor: [half, -half]
   });
 }
 
-function drawLand(ctx){
-  ctx.fillStyle='#e4ddd0';
-  function poly(pts){
-    ctx.beginPath();
-    pts.forEach(([lng,lat],i)=>{
-      const x=mercX(lng,MP.scale,MP.ox),y=mercY(lat,MP.scale,MP.oy);
-      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
-    });
-    ctx.closePath();ctx.fill();
-    ctx.strokeStyle='rgba(190,175,158,0.5)';ctx.lineWidth=0.4;ctx.stroke();
-  }
-  // Major land masses
-  poly([[-168,72],[-140,70],[-110,72],[-85,65],[-65,68],[-55,50],[-65,44],[-70,42],[-75,35],[-80,25],[-88,16],[-92,18],[-105,20],[-117,32],[-120,37],[-124,49],[-138,59],[-155,60],[-168,60]]);
-  poly([[-73,83],[-25,83],[-18,76],[-20,68],[-43,58],[-65,62],[-73,73]]);
-  poly([[-80,12],[-65,12],[-50,4],[-35,-5],[-35,-20],[-52,-34],[-65,-42],[-68,-56],[-76,-52],[-80,-30],[-82,-4]]);
-  poly([[-10,36],[10,36],[20,38],[30,40],[40,38],[40,46],[30,50],[25,55],[18,60],[10,65],[-2,58],[-8,48]]);
-  poly([[5,57],[8,58],[15,68],[28,70],[30,62],[24,58],[18,58],[12,56],[8,56]]);
-  poly([[-18,15],[0,18],[30,22],[38,12],[42,8],[40,-10],[34,-22],[25,-35],[15,-30],[10,-18],[0,-5]]);
-  poly([[36,38],[42,36],[54,24],[58,22],[56,12],[44,12],[38,14],[34,20],[36,32]]);
-  poly([[30,70],[60,72],[90,75],[120,72],[140,68],[170,66],[175,60],[165,50],[140,42],[120,38],[100,38],[80,42],[70,38],[60,40],[50,46],[40,44],[30,52],[30,60]]);
-  poly([[100,20],[110,18],[118,22],[122,30],[122,40],[120,48],[110,50],[100,44],[95,28]]);
-  poly([[130,32],[132,34],[135,35],[135,33],[132,31]]);
-  poly([[140,38],[142,41],[141,44],[139,42],[139,38]]);
-  poly([[62,22],[72,22],[80,28],[90,24],[86,16],[80,8],[74,8],[68,22]]);
-  poly([[100,8],[105,14],[110,18],[118,22],[112,6],[104,2],[100,4],[98,8]]);
-  poly([[114,-22],[122,-20],[130,-14],[136,-12],[140,-18],[146,-38],[136,-38],[128,-34],[114,-30]]);
-  poly([[172,-36],[176,-40],[174,-44],[170,-46],[170,-42]]);
-  poly([[95,4],[102,2],[106,-6],[112,-8],[116,-6],[114,0],[110,2],[104,2]]);
+function makeTooltipContent(r, rat) {
+  const [cRat, cCount] = getCR(r.id);
+  let ratingLine;
+  if (rat) ratingLine = `<div class="t-rating">Your rating: ${rat}/10 — ${CAPS[rat]}</div>`;
+  else if (cRat) ratingLine = `<div class="t-rating">${cRat}/10 · ${fmtN(cCount)} reviews</div>`;
+  else ratingLine = `<div class="t-rating" style="color:#999">Not yet rated</div>`;
+  const meta = [r.area, r.city, r.price, r.m ? mStars(r.m) : null].filter(Boolean).join(' · ');
+  return `<div class="t-name">${r.name}</div><div class="t-meta">${meta}</div>${ratingLine}`;
 }
 
-function hitTest(mx,my){
-  const rats=getRatings(),list=getFiltered().filter(r=>r.lat&&r.lng);
-  let best=null,bestD=999;
-  list.forEach(r=>{
-    const{x,y}=rXY(r);
-    const d=Math.hypot(mx-x,my-y);
-    if(d<Math.max(rats[r.id]?9:7,13)&&d<bestD){best=r;bestD=d;}
-  });
-  return best;
-}
+function drawMap() {
+  if (!leafletMap) return;
+  const rats = getRatings();
+  const list = getFiltered().filter(r => r.lat && r.lng);
+  const visibleIds = new Set(list.map(r => String(r.id)));
 
-function showTip(r,mx,my){
-  const tip=document.getElementById('map-tip'),mc=document.getElementById('map-container');
-  const rats=getRatings(),rat=rats[r.id],[cRat,cCount]=getCR(r.id);
-  document.getElementById('tip-name').textContent=r.name;
-  document.getElementById('tip-meta').textContent=[r.area,r.city,r.price,r.m?mStars(r.m)+' Michelin':null].filter(Boolean).join(' · ');
-  const tr=document.getElementById('tip-rating');
-  if(rat)tr.textContent='Your rating: '+rat+'/10 — '+CAPS[rat];
-  else if(cRat)tr.textContent='Community: '+cRat+'/10 ('+fmtN(cCount)+' reviews)';
-  else tr.textContent='Not yet rated';
-  const btn=document.getElementById('tip-btn');
-  btn.textContent=rat?'Update rating':'Rate this counter';
-  btn.onclick=()=>{hideTip();openModal(r.id);};
-  MP.tipId=r.id;
-  tip.style.display='block';
-  const tw=tip.offsetWidth,th=tip.offsetHeight,cw=mc.clientWidth,ch=mc.clientHeight;
-  let tx=mx+16,ty=my-th/2;
-  if(tx+tw>cw-10)tx=mx-tw-16;
-  if(ty<5)ty=5;if(ty+th>ch-5)ty=ch-th-5;
-  tip.style.left=tx+'px';tip.style.top=ty+'px';
-}
-function hideTip(){document.getElementById('map-tip').style.display='none';MP.tipId=null;}
-
-let eventsSetup=false;
-function setupMapEvents(){
-  if(eventsSetup)return;eventsSetup=true;
-  const cv=document.getElementById('map-canvas');
-  cv.addEventListener('mousemove',e=>{
-    const rect=cv.getBoundingClientRect(),mx=e.clientX-rect.left,my=e.clientY-rect.top;
-    if(MP.drag){
-      MP.ox+=e.clientX-MP.lx;MP.oy+=e.clientY-MP.ly;
-      MP.lx=e.clientX;MP.ly=e.clientY;hideTip();drawMap();return;
+  // Remove markers no longer in filtered list
+  Object.keys(leafletMarkers).forEach(id => {
+    if (!visibleIds.has(id)) {
+      leafletMap.removeLayer(leafletMarkers[id]);
+      delete leafletMarkers[id];
     }
-    const hit=hitTest(mx,my);
-    if(hit){
-      cv.style.cursor='pointer';
-      if(MP.hovId!==hit.id){MP.hovId=hit.id;drawMap();}
-      showTip(hit,mx,my);
+  });
+
+  // Add / update markers
+  list.forEach(r => {
+    const rat = rats[r.id];
+    const id = String(r.id);
+    const icon = makeMarkerIcon(r, rat);
+
+    if (leafletMarkers[id]) {
+      // Update icon in case rating changed
+      leafletMarkers[id].setIcon(icon);
+      leafletMarkers[id].setTooltipContent(makeTooltipContent(r, rat));
     } else {
-      cv.style.cursor='grab';
-      if(MP.hovId!==null){MP.hovId=null;drawMap();}
-      if(MP.tipId)hideTip();
+      const marker = L.marker([r.lat, r.lng], { icon, riseOnHover: true });
+      marker.bindTooltip(makeTooltipContent(r, rat), {
+        className: 'sushi-tooltip',
+        direction: 'top',
+        offset: [0, -4],
+        opacity: 1
+      });
+      marker.on('click', () => openModal(r.id));
+      marker.addTo(leafletMap);
+      leafletMarkers[id] = marker;
     }
   });
-  cv.addEventListener('mousedown',e=>{
-    const rect=cv.getBoundingClientRect(),mx=e.clientX-rect.left,my=e.clientY-rect.top;
-    if(!hitTest(mx,my)){MP.drag=true;MP.lx=e.clientX;MP.ly=e.clientY;cv.style.cursor='grabbing';}
-  });
-  window.addEventListener('mouseup',()=>{MP.drag=false;});
-  cv.addEventListener('click',e=>{
-    const rect=cv.getBoundingClientRect(),hit=hitTest(e.clientX-rect.left,e.clientY-rect.top);
-    if(hit)openModal(hit.id);
-  });
-  cv.addEventListener('wheel',e=>{
-    e.preventDefault();
-    const rect=cv.getBoundingClientRect(),mx=e.clientX-rect.left,my=e.clientY-rect.top;
-    const f=e.deltaY<0?1.12:0.89;
-    MP.ox=(MP.ox-mx)*f+mx;MP.oy=(MP.oy-my)*f+my;MP.scale*=f;hideTip();drawMap();
-  },{passive:false});
-  // Touch
-  let lastD=null;
-  cv.addEventListener('touchstart',e=>{if(e.touches.length===1){MP.drag=true;MP.lx=e.touches[0].clientX;MP.ly=e.touches[0].clientY;}lastD=null;},{passive:true});
-  cv.addEventListener('touchmove',e=>{
-    e.preventDefault();
-    if(e.touches.length===2){
-      const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY,d=Math.hypot(dx,dy);
-      if(lastD){
-        const f=d/lastD,mx=(e.touches[0].clientX+e.touches[1].clientX)/2,my=(e.touches[0].clientY+e.touches[1].clientY)/2;
-        const rect=cv.getBoundingClientRect(),cx=mx-rect.left,cy=my-rect.top;
-        MP.ox=(MP.ox-cx)*f+cx;MP.oy=(MP.oy-cy)*f+cy;MP.scale*=f;drawMap();
-      }lastD=d;
-    } else if(e.touches.length===1&&MP.drag){
-      MP.ox+=e.touches[0].clientX-MP.lx;MP.oy+=e.touches[0].clientY-MP.ly;
-      MP.lx=e.touches[0].clientX;MP.ly=e.touches[0].clientY;drawMap();
-    }
-  },{passive:false});
-  cv.addEventListener('touchend',()=>{MP.drag=false;lastD=null;},{passive:true});
 }
 
-function mapZoom(f){
-  const cv=document.getElementById('map-canvas'),cx=cv.width/2,cy=cv.height/2;
-  MP.ox=(MP.ox-cx)*f+cx;MP.oy=(MP.oy-cy)*f+cy;MP.scale*=f;drawMap();
-}
-function mapReset(){
-  const mc=document.getElementById('map-container');
-  mapInit(mc.clientWidth,mc.clientHeight);drawMap();
-}
-function showMap(){
-  const mc=document.getElementById('map-container');
-  const w=mc.clientWidth||800,h=mc.clientHeight||500;
-  if(!MP.scale)mapInit(w,h);
-  setupMapEvents();drawMap();
+function showMap() {
+  if (!leafletMap) {
+    leafletMap = L.map('leaflet-map', {
+      center: [35, -30],
+      zoom: 2,
+      zoomControl: true,
+      attributionControl: true
+    });
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 19
+    }).addTo(leafletMap);
+  }
+  setTimeout(() => {
+    leafletMap.invalidateSize();
+    drawMap();
+  }, 80);
 }
 
 // ── DISPLAY SWITCH ────────────────────────────────────────────────────────
@@ -846,11 +729,11 @@ function switchDisplay(mode){
   const ge=document.getElementById('view-grid'),me=document.getElementById('view-map');
   if(mode==='map'){
     ge.style.display='none';
-    me.style.display='block'; // <--- CHANGED TO 'block'
-    requestAnimationFrame(()=>requestAnimationFrame(showMap));
+    me.style.display='block';
+    showMap();
   } else {
     me.style.display='none';
-    ge.style.display='block'; // <--- CHANGED TO 'block'
+    ge.style.display='block';
   }
   document.getElementById('vt-grid').classList.toggle('active',mode==='grid');
   document.getElementById('vt-map').classList.toggle('active',mode==='map');
@@ -940,7 +823,7 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){closeModal();closeAddModal();closeAuthModal();}
   if(e.key==='Enter'){const ao=document.getElementById('auth-overlay');if(ao.classList.contains('open')){if(document.getElementById('au-pass2'))doRegister();else doLogin();}}
 });
-window.addEventListener('resize',()=>{if(st.display==='map')drawMap();});
+window.addEventListener('resize',()=>{if(st.display==='map'&&leafletMap)leafletMap.invalidateSize();});
 
 // INIT
 renderUserArea();renderCards();renderSidePanel();
