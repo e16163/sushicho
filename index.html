@@ -657,7 +657,7 @@ async function fetchExternalRatings(r) {
 
   try {
     // 2. Call your internal API route
-    const res = await fetch('https://sushichoback.vercel.app/key-api', {
+    const res = await fetch('https://sushichoback.vercel.app/api/key-api', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
@@ -696,17 +696,16 @@ function ratingPill(platform,data,loading){
     <span class="ext-rating-ct">${fmtN(data.reviews)} reviews</span>
   </div>`;
 }
-function renderExtLinks(r,ratings,loading){
-  const hasKey=!!getApiKey();
-  const noKeyHint=!hasKey?`<span class="ext-no-key" onclick="openSettings()">add key for live ratings</span>`:'';
-  return`
+function renderExtLinks(r, ratings, loading) {
+  // We removed "const hasKey" because the key is now safely on Vercel!
+  return `
     <div class="ext-link-row">
       <a class="ext-link ext-link-yelp" href="${yelpUrl(r)}" target="_blank" rel="noopener">${YELP_SVG} Yelp ↗</a>
-      ${hasKey?ratingPill('yelp',ratings?.yelp,loading):noKeyHint}
+      ${ratingPill('yelp', ratings?.yelp, loading)}
     </div>
     <div class="ext-link-row">
       <a class="ext-link ext-link-google" href="${googleUrl(r)}" target="_blank" rel="noopener">${GMAP_SVG} Google Maps ↗</a>
-      ${hasKey?ratingPill('google',ratings?.google,loading):''}
+      ${ratingPill('google', ratings?.google, loading)}
     </div>`;
 }
 
