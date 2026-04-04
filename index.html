@@ -657,7 +657,7 @@ async function fetchExternalRatings(r) {
 
   try {
     // 2. Call your internal API route
-    const res = await fetch('/api/key-api', {
+    const res = await fetch('https://sushichoback.vercel.app/key-api', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
