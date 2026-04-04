@@ -3,705 +3,324 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>鮨帖 · Sushicho</title>
+<title>Sushicho · 鮨帖</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <style>
-:root {
-  --white:       #FEFCF9;
-  --cream:       #F7F0E6;
-  --cream2:      #EEE5D8;
-  --sakura-pale: #FDF0F3;
-  --sakura:      #F0C5CC;
-  --sakura-mid:  #D98A9A;
-  --sakura-deep: #B05A6A;
-  --ink:         #231810;
-  --ink-mid:     #6B5045;
-  --ink-light:   #A68878;
-  --border:      #E8DDD2;
-  --border-lt:   #F2EBE3;
-  --japan:       #C0392B;
-  --japan-lt:    #F9ECEA;
-  --na:          #3A6B4A;
-  --na-lt:       #EAF2EC;
-  --custom:      #7A5C14;
-  --custom-lt:   #F5EFE0;
-  --gold:        #A8780A;
-  --sh:          rgba(35,24,16,.07);
-}
-* { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior: smooth; }
+:root{--white:#FAFAFA;--cream:#FFF5F5;--red:#C0392B;--red2:#E74C3C;--pink:#FDE8E8;--pink2:#FAD4D4;--rose:#F0BABA;--g1:#111111;--g2:#333333;--g3:#666666;--g4:#999999;--g5:#CCCCCC;--g6:#F0EDED;--border:#E5DADA}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--white);color:var(--g1);min-height:100vh;overflow-x:hidden}
 
-body {
-  font-family: 'DM Sans', 'Helvetica Neue', sans-serif;
-  background: var(--white);
-  color: var(--ink);
-  min-height: 100vh;
-  overflow-x: hidden;
-}
+header{position:sticky;top:0;z-index:300;background:var(--white);border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;height:52px;gap:0}
+.logo{display:flex;align-items:center;gap:9px;cursor:pointer;text-decoration:none;margin-right:36px;flex-shrink:0}
+.logo-text{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--g1);letter-spacing:-.3px}
+.logo-jp{font-family:'Playfair Display',serif;font-size:13px;color:var(--red)}
+nav{display:flex;gap:0}
+.nav-btn{background:none;border:none;cursor:pointer;padding:0 15px;height:52px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:400;color:var(--g3);border-bottom:2px solid transparent;transition:all .15s;margin-bottom:-1px}
+.nav-btn:hover{color:var(--g1)}
+.nav-btn.active{color:var(--red);border-bottom-color:var(--red);font-weight:500}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.search-wrap{display:flex;align-items:center;gap:7px;border:1px solid var(--border);border-radius:6px;padding:6px 11px;background:var(--g6)}
+.search-wrap input{background:none;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--g1);width:170px}
+.search-wrap input::placeholder{color:var(--g4)}
+.search-lbl{font-family:'DM Sans',sans-serif;font-size:11px;color:var(--g4)}
+.login-btn{border:1px solid var(--border);background:none;cursor:pointer;padding:7px 15px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:var(--g2);transition:all .15s}
+.login-btn:hover{border-color:var(--g1);color:var(--g1)}
+.add-btn{border:1px solid var(--red);background:var(--red);cursor:pointer;padding:7px 15px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:white;transition:all .15s}
+.add-btn:hover{background:var(--red2)}
 
-/* PETALS */
-#petal-layer {
-  position: fixed; inset: 0;
-  pointer-events: none; z-index: 0; overflow: hidden;
-}
-.pk {
-  position: absolute;
-  opacity: 0;
-  animation: pkfall linear infinite;
-}
-.pk::before, .pk::after {
-  content: '';
-  position: absolute;
-  width: 100%; height: 100%;
-  background: inherit;
-  border-radius: inherit;
-}
-@keyframes pkfall {
-  0%   { opacity: 0; transform: translateY(-30px) rotate(0deg) translateX(0); }
-  10%  { opacity: .7; }
-  85%  { opacity: .4; }
-  100% { opacity: 0; transform: translateY(105vh) rotate(600deg) translateX(40px); }
-}
+.app-layout{display:grid;grid-template-columns:1fr 300px;min-height:calc(100vh - 52px)}
+.content-col{border-right:1px solid var(--border);min-width:0}
 
-/* HEADER */
-header {
-  position: sticky; top: 0; z-index: 200;
-  background: var(--white);
-  border-bottom: 1px solid var(--border);
-  padding: 0 48px;
-  display: flex; align-items: center; gap: 32px;
-  height: 60px;
-}
-.logo {
-  display: flex; align-items: baseline; gap: 10px;
-  cursor: pointer; text-decoration: none;
-  flex-shrink: 0;
-}
-.logo-jp {
-  font-family: 'Noto Serif JP', Georgia, serif;
-  font-size: 22px; font-weight: 400;
-  color: var(--ink); letter-spacing: 2px;
-}
-.logo-rom {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 13px; font-weight: 400;
-  color: var(--ink-light); letter-spacing: 4px;
-  text-transform: uppercase;
-}
-.logo-accent {
-  width: 4px; height: 4px; background: var(--sakura-deep);
-  border-radius: 50%; align-self: center;
-}
+.filters{position:sticky;top:52px;z-index:200;background:var(--white);border-bottom:1px solid var(--border);padding:8px 20px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.f-btn{background:none;border:1px solid var(--border);padding:5px 13px;border-radius:20px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--g3);transition:all .13s}
+.f-btn:hover{color:var(--g1);border-color:var(--g5)}
+.f-btn.active{background:var(--red);border-color:var(--red);color:white;font-weight:500}
+.f-sep{width:1px;height:16px;background:var(--border);flex-shrink:0;margin:0 2px}
+.view-toggle{display:flex;gap:3px}
+.vt-btn{background:none;border:1px solid var(--border);padding:5px 12px;border-radius:6px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:11px;color:var(--g3);transition:all .12s}
+.vt-btn.active{background:var(--g6);color:var(--g1);border-color:var(--g5);font-weight:500}
+.sort-sel{margin-left:auto;background:none;border:1px solid var(--border);padding:5px 9px;border-radius:6px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:11px;color:var(--g3);outline:none}
+.count-lbl{font-family:'DM Sans',sans-serif;font-size:11px;color:var(--g4)}
 
-nav { display: flex; gap: 2px; }
-.nav-btn {
-  background: none; border: none; cursor: pointer;
-  padding: 6px 16px; font-family: 'DM Sans', sans-serif;
-  font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
-  color: var(--ink-light); border-radius: 20px; transition: all .18s;
-}
-.nav-btn:hover { color: var(--ink); background: var(--cream); }
-.nav-btn.active { color: var(--ink); background: var(--cream); }
-
-.header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
-.search-field {
-  display: flex; align-items: center; gap: 8px;
-  background: var(--cream); border: 1px solid var(--border);
-  border-radius: 20px; padding: 6px 14px;
-  transition: border-color .2s;
-}
-.search-field:focus-within { border-color: var(--sakura-mid); }
-.search-field input {
-  background: none; border: none; outline: none;
-  font-family: 'DM Sans', sans-serif; font-size: 13px;
-  color: var(--ink); width: 180px;
-}
-.search-field input::placeholder { color: var(--ink-light); }
-.search-icon {
-  width: 13px; height: 13px; border: 1.5px solid var(--ink-light);
-  border-radius: 50%; position: relative; flex-shrink: 0;
-}
-.search-icon::after {
-  content: ''; position: absolute;
-  width: 5px; height: 1.5px;
-  background: var(--ink-light);
-  transform: rotate(45deg); bottom: -3px; right: -3px;
-  border-radius: 1px;
-}
-
-.add-btn {
-  background: var(--ink); color: var(--white);
-  border: none; cursor: pointer;
-  padding: 8px 18px; border-radius: 2px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
-  transition: background .2s; white-space: nowrap;
-}
-.add-btn:hover { background: var(--sakura-deep); }
-
-/* HERO */
-.hero {
-  position: relative;
-  background: var(--cream);
-  padding: 64px 48px 52px;
-  text-align: center;
-  border-bottom: 1px solid var(--border);
-  overflow: hidden;
-}
-.hero-bg-kanji {
-  font-family: 'Noto Serif JP', Georgia, serif;
-  font-size: 200px; font-weight: 300;
-  color: rgba(35,24,16,.03);
-  position: absolute; top: -20px; left: 50%;
-  transform: translateX(-50%);
-  pointer-events: none; white-space: nowrap;
-  letter-spacing: 20px; line-height: 1;
-}
-.hero-tag {
-  font-family: 'DM Sans', sans-serif; font-size: 11px;
-  letter-spacing: 4px; text-transform: uppercase;
-  color: var(--sakura-deep); margin-bottom: 16px;
-  position: relative; z-index: 1;
-  animation: fadein .7s .1s both;
-}
-.hero-title {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 50px; font-weight: 300; line-height: 1.1;
-  color: var(--ink); letter-spacing: 2px;
-  position: relative; z-index: 1;
-  animation: fadein .7s .2s both;
-}
-.hero-title em { font-style: italic; color: var(--sakura-deep); }
-.hero-jp {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 14px; font-weight: 300; letter-spacing: 8px;
-  color: var(--ink-light); margin-top: 10px;
-  position: relative; z-index: 1;
-  animation: fadein .7s .3s both;
-}
-.hero-line {
-  width: 1px; height: 40px; background: var(--border);
-  margin: 24px auto;
-  position: relative; z-index: 1;
-  animation: fadein .7s .4s both;
-}
-.hero-stats {
-  display: flex; gap: 0; justify-content: center;
-  position: relative; z-index: 1;
-  animation: fadein .7s .5s both;
-}
-.stat { padding: 0 32px; text-align: center; }
-.stat + .stat { border-left: 1px solid var(--border); }
-.stat-n {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 32px; font-weight: 300; color: var(--ink);
-  display: block;
-}
-.stat-l { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-light); }
-
-@keyframes fadein {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* FILTERS */
-.filters {
-  position: sticky; top: 60px; z-index: 190;
-  background: rgba(254,252,249,.95);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--border);
-  padding: 12px 48px;
-  display: flex; align-items: center; gap: 8px;
-}
-.f-btn {
-  background: none; border: 1px solid var(--border);
-  padding: 6px 16px; border-radius: 20px; cursor: pointer;
-  font-family: 'DM Sans', sans-serif; font-size: 11px;
-  letter-spacing: 1.5px; text-transform: uppercase;
-  color: var(--ink-light); transition: all .18s;
-}
-.f-btn:hover { color: var(--ink); border-color: var(--ink-light); }
-.f-btn.active { background: var(--ink); border-color: var(--ink); color: var(--white); }
-
-.f-sep { flex-shrink: 0; width: 1px; height: 16px; background: var(--border); }
-
-.sort-sel {
-  margin-left: auto;
-  background: none; border: 1px solid var(--border);
-  padding: 6px 14px; border-radius: 20px; cursor: pointer;
-  font-family: 'DM Sans', sans-serif; font-size: 11px;
-  letter-spacing: 1px; color: var(--ink-light); outline: none;
-}
-.count-label { font-size: 11px; color: var(--ink-light); letter-spacing: 1px; }
-
-/* GRID */
-#view-explore { position: relative; z-index: 1; }
-#view-map     { display: none; position: relative; z-index: 1; }
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1px;
-  border-top: 1px solid var(--border);
-  background: var(--border);
-}
-
-/* CARD */
-.card {
-  background: var(--white);
-  padding: 28px 28px 22px;
-  cursor: pointer;
-  position: relative;
-  transition: background .18s;
-  animation: cardrise .4s both;
-  border-left: 3px solid transparent;
-}
-.card:hover { background: var(--sakura-pale); }
-.card.region-japan { border-left-color: var(--japan); }
-.card.region-na    { border-left-color: var(--na); }
-.card.region-custom{ border-left-color: var(--custom); }
-
-@keyframes cardrise {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.card-meta {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 14px;
-}
-.card-region-tag {
-  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
-  font-weight: 500;
-}
-.tag-japan  { color: var(--japan); }
-.tag-na     { color: var(--na); }
-.tag-custom { color: var(--custom); }
-
-.michelin-dots { display: flex; gap: 4px; align-items: center; }
-.m-dot {
-  width: 7px; height: 7px; border-radius: 50%;
-  background: #C41E3A;
-}
-.m-label {
-  font-size: 10px; letter-spacing: 1px; color: var(--ink-light);
-  margin-right: 4px;
-}
-
-.card-name {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 22px; font-weight: 400; line-height: 1.2;
-  color: var(--ink); margin-bottom: 5px;
-  transition: color .18s;
-}
-.card:hover .card-name { color: var(--sakura-deep); }
-
-.card-loc {
-  font-size: 12px; color: var(--ink-light);
-  letter-spacing: .5px; margin-bottom: 8px;
-}
-.card-type {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 14px; font-style: italic; color: var(--ink-mid);
-  margin-bottom: 14px;
-}
-.card-desc {
-  font-size: 12px; color: var(--ink-mid); line-height: 1.65;
-  margin-bottom: 18px;
-  display: -webkit-box; -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical; overflow: hidden;
-}
-
-.card-footer {
-  display: flex; align-items: center; justify-content: space-between;
-  padding-top: 14px; border-top: 1px solid var(--border-lt);
-}
-.rating-val {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 26px; font-weight: 300; color: var(--ink);
-  line-height: 1;
-}
-.rating-val.none { font-size: 14px; color: var(--ink-light); font-family: 'DM Sans', sans-serif; }
-.rating-sub { font-size: 10px; color: var(--ink-light); letter-spacing: 1px; margin-top: 2px; }
-.price-str { font-size: 12px; color: var(--ink-light); letter-spacing: 1px; }
-
-.rate-chip {
-  background: none; border: 1px solid var(--border);
-  padding: 6px 14px; border-radius: 2px; cursor: pointer;
-  font-family: 'DM Sans', sans-serif; font-size: 10px;
-  letter-spacing: 2px; text-transform: uppercase;
-  color: var(--ink-mid); transition: all .18s;
-}
-.rate-chip:hover { background: var(--ink); border-color: var(--ink); color: var(--white); }
-.rate-chip.rated { background: var(--na); border-color: var(--na); color: var(--white); }
-
-/* EMPTY */
-.empty {
-  text-align: center; padding: 100px 48px;
-  position: relative; z-index: 1;
-}
-.empty-jp {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 60px; font-weight: 300;
-  color: var(--border); margin-bottom: 16px; display: block;
-}
-.empty p { font-size: 14px; color: var(--ink-light); letter-spacing: 1px; }
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:0}
+.card{background:var(--white);border-right:1px solid var(--border);border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s;animation:rise .3s both;overflow:hidden}
+.card:hover{background:var(--cream)}
+.card:hover .card-img img{transform:scale(1.04)}
+@keyframes rise{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.card-img{width:100%;height:155px;overflow:hidden;position:relative;background:var(--pink)}
+.card-img img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease;display:block}
+.card-img-fallback{position:absolute;inset:0;display:none;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:36px;color:var(--rose);background:var(--pink)}
+.img-region-tag{position:absolute;top:8px;left:8px;font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;letter-spacing:.4px;text-transform:uppercase;color:white;padding:2px 8px;border-radius:20px}
+.tag-japan{background:rgba(192,57,43,.82)}.tag-na{background:rgba(30,80,60,.82)}.tag-custom{background:rgba(100,80,40,.82)}
+.michelin-badge{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.92);border-radius:20px;padding:2px 8px;font-family:'DM Sans',sans-serif;font-size:10px;color:var(--red);font-weight:600;letter-spacing:.5px}
+.card-body{padding:13px 15px 11px}
+.card-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:600;line-height:1.2;color:var(--g1);margin-bottom:3px}
+.card-meta{font-family:'DM Sans',sans-serif;font-size:11px;color:var(--g4);margin-bottom:5px}
+.card-type{font-family:'DM Sans',sans-serif;font-size:11px;font-style:italic;color:var(--g3);margin-bottom:7px}
+.card-desc{font-family:'DM Sans',sans-serif;font-size:11px;color:var(--g3);line-height:1.6;margin-bottom:11px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:9px;border-top:1px solid var(--border)}
+.rating-block{display:flex;align-items:baseline;gap:0;flex-wrap:wrap}
+.rating-num{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--g1);line-height:1}
+.rating-denom{font-family:'DM Sans',sans-serif;font-size:10px;color:var(--g4);margin-left:2px}
+.rating-reviews{font-family:'DM Sans',sans-serif;font-size:10px;color:var(--g4);margin-left:5px;white-space:nowrap}
+.rating-unrated{font-family:'DM Sans',sans-serif;font-size:11px;color:var(--g5);font-style:italic}
+.card-footer-right{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.price-lbl{font-family:'DM Sans',sans-serif;font-size:11px;color:var(--g3)}
+.rate-btn{background:none;border:1px solid var(--border);padding:4px 11px;border-radius:20px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:11px;color:var(--g3);transition:all .12s}
+.rate-btn:hover{border-color:var(--red);color:var(--red)}
+.rate-btn.rated{background:var(--pink);border-color:var(--rose);color:var(--red);font-weight:500}
+.comm-bar-wrap{height:2px;background:var(--border);margin:0;overflow:hidden}
+.comm-bar{height:100%;background:var(--red);transition:width .4s}
 
 /* MAP */
-#map-container { height: calc(100vh - 121px); position: relative; }
-#map { width: 100%; height: 100%; }
+#view-map{display:none}
+.map-container{position:relative;width:100%;height:calc(100vh - 52px - 48px);min-height:400px;background:#dde8f0;overflow:hidden;cursor:grab;user-select:none}
+.map-container:active{cursor:grabbing}
+#map-canvas{display:block}
+.map-tip{position:absolute;pointer-events:none;background:white;border:1px solid var(--border);border-radius:10px;padding:12px 14px;box-shadow:0 8px 24px rgba(0,0,0,.12);min-width:195px;max-width:240px;z-index:100;display:none}
+.map-tip-name{font-family:'Playfair Display',serif;font-size:14px;font-weight:600;color:var(--g1);margin-bottom:2px}
+.map-tip-meta{font-family:'DM Sans',sans-serif;font-size:11px;color:var(--g3);margin-bottom:4px}
+.map-tip-rating{font-family:'DM Sans',sans-serif;font-size:12px;color:var(--red);font-weight:500;margin-bottom:8px}
+.map-tip-btn{background:var(--red);color:white;border:none;padding:5px 13px;border-radius:20px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;pointer-events:all}
+.map-tip-btn:hover{background:var(--red2)}
+.map-controls{position:absolute;bottom:16px;right:16px;display:flex;flex-direction:column;gap:4px;z-index:50}
+.map-ctrl-btn{width:32px;height:32px;background:white;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:16px;font-weight:400;color:var(--g1);display:flex;align-items:center;justify-content:center;transition:all .12s;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.map-ctrl-btn:hover{background:var(--g6)}
+.map-legend{position:absolute;bottom:16px;left:16px;background:white;border:1px solid var(--border);border-radius:8px;padding:10px 13px;font-family:'DM Sans',sans-serif;font-size:11px;color:var(--g3);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.map-legend-item{display:flex;align-items:center;gap:7px;margin-bottom:4px}
+.map-legend-item:last-child{margin-bottom:0}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 
-.map-panel {
-  position: absolute; left: 16px; top: 16px; z-index: 1000;
-  background: var(--white); border: 1px solid var(--border);
-  width: 260px; max-height: calc(100vh - 160px);
-  overflow-y: auto; border-radius: 2px;
-  box-shadow: 0 4px 20px var(--sh);
-}
-.map-panel-hd {
-  padding: 14px 16px; border-bottom: 1px solid var(--border);
-  font-family: 'Cormorant Garamond', serif; font-size: 14px;
-  color: var(--ink); letter-spacing: 1px;
-  position: sticky; top: 0; background: var(--white); z-index: 1;
-}
-.map-row {
-  padding: 10px 16px; border-bottom: 1px solid var(--border-lt);
-  cursor: pointer; transition: background .15s;
-  display: flex; align-items: center; gap: 10px;
-}
-.map-row:hover { background: var(--cream); }
-.map-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.map-rname { font-size: 12px; color: var(--ink); font-weight: 500; line-height: 1.3; }
-.map-rcity { font-size: 10px; color: var(--ink-light); letter-spacing: .5px; }
-.map-rscore { margin-left: auto; font-family: 'Cormorant Garamond', serif; font-size: 15px; color: var(--ink); flex-shrink: 0; }
+/* SIDE */
+.side-panel{position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;background:var(--white)}
+.side-sec{padding:18px 18px 0}
+.side-sec+.side-sec{border-top:1px solid var(--border);margin-top:14px;padding-top:18px}
+.side-sec:last-child{padding-bottom:18px}
+.side-heading{font-family:'DM Serif Display',serif;font-size:14px;color:var(--g1);margin-bottom:12px;letter-spacing:-.2px}
+.side-heading em{font-style:italic;color:var(--red)}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:14px}
+.stat-mini{background:var(--pink);border-radius:8px;padding:11px 8px;text-align:center}
+.stat-mini-n{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--red);line-height:1}
+.stat-mini-l{font-family:'DM Sans',sans-serif;font-size:10px;color:var(--g3);margin-top:2px}
+.tag-cloud{display:flex;flex-wrap:wrap;gap:5px;padding-bottom:14px}
+.tag-pill{font-family:'DM Sans',sans-serif;font-size:11px;color:var(--g2);background:var(--g6);border:1px solid var(--border);padding:3px 9px;border-radius:20px;cursor:pointer;transition:all .12s}
+.tag-pill:hover{background:var(--pink);border-color:var(--rose);color:var(--red)}
+.rec-card{display:flex;gap:9px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:opacity .12s}
+.rec-card:hover{opacity:.72}
+.rec-card:last-child{border-bottom:none}
+.rec-thumb{width:50px;height:50px;border-radius:7px;overflow:hidden;flex-shrink:0;background:var(--pink)}
+.rec-thumb img{width:100%;height:100%;object-fit:cover}
+.rec-info{flex:1;min-width:0}
+.rec-name{font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--g1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rec-meta{font-family:'DM Sans',sans-serif;font-size:10px;color:var(--g4);margin:1px 0 2px}
+.rec-reason{font-family:'DM Sans',sans-serif;font-size:10px;color:var(--g3);font-style:italic}
+.top-item{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:opacity .12s}
+.top-item:hover{opacity:.7}
+.top-item:last-child{border-bottom:none}
+.top-rank{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--rose);width:20px;text-align:right;flex-shrink:0}
+.top-name{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:var(--g1);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top-city{font-family:'DM Sans',sans-serif;font-size:10px;color:var(--g4);flex-shrink:0}
+.top-score{font-family:'Playfair Display',serif;font-size:14px;font-weight:600;color:var(--red);flex-shrink:0}
 
-.map-legend {
-  position: absolute; bottom: 20px; right: 16px; z-index: 1000;
-  background: var(--white); border: 1px solid var(--border);
-  padding: 10px 14px; border-radius: 2px;
-  box-shadow: 0 2px 10px var(--sh);
-}
-.leg-row { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--ink-mid); margin-bottom: 5px; letter-spacing: .5px; }
-.leg-row:last-child { margin: 0; }
-.leg-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+/* MODALS */
+.overlay{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.38);align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(2px)}
+.overlay.open{display:flex}
+@keyframes popin{from{opacity:0;transform:scale(.96) translateY(7px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-box{background:var(--white);border-radius:12px;max-width:400px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.14);animation:popin .2s ease;overflow:hidden;position:relative}
+.modal-header{padding:22px 22px 18px;border-bottom:1px solid var(--border)}
+.modal-title{font-family:'DM Serif Display',serif;font-size:21px;color:var(--g1)}
+.modal-sub{font-family:'DM Sans',sans-serif;font-size:12px;color:var(--g3);margin-top:3px}
+.modal-body{padding:18px 22px 22px}
+.modal-close{position:absolute;top:12px;right:12px;background:var(--g6);border:none;width:27px;height:27px;border-radius:50%;cursor:pointer;color:var(--g3);font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .12s;z-index:1;font-family:'DM Sans',sans-serif}
+.modal-close:hover{background:var(--border);color:var(--g1)}
+.form-field{margin-bottom:13px}
+.form-label{display:block;font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;color:var(--g3);margin-bottom:5px}
+.form-inp,.form-sel,.form-ta{width:100%;background:var(--g6);border:1px solid var(--border);padding:9px 11px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--g1);outline:none;border-radius:8px;transition:border-color .12s}
+.form-inp:focus,.form-sel:focus,.form-ta:focus{border-color:var(--red);background:var(--white)}
+.form-ta{resize:vertical;min-height:65px;font-size:13px;line-height:1.6}
+.btn-primary{width:100%;padding:11px;background:var(--red);color:white;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;transition:background .12s;border-radius:8px;margin-top:4px}
+.btn-primary:hover{background:var(--red2)}
+.modal-switch{text-align:center;margin-top:11px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--g3)}
+.modal-switch a{color:var(--red);cursor:pointer;text-decoration:underline}
+.rate-modal{background:var(--white);border-radius:12px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.14);animation:popin .2s ease}
+.rate-modal-img{width:100%;height:190px;overflow:hidden;position:relative;background:var(--pink)}
+.rate-modal-img img{width:100%;height:100%;object-fit:cover}
+.rate-modal-grad{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,rgba(0,0,0,.55))}
+.rate-modal-name{position:absolute;bottom:13px;left:16px;right:48px;font-family:'DM Serif Display',serif;font-size:24px;font-style:italic;color:white;line-height:1.1}
+.rate-modal-body{padding:18px 20px 22px}
+.rate-modal-loc{font-family:'DM Sans',sans-serif;font-size:10px;color:var(--g4);margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px}
+.rate-modal-type{font-family:'DM Sans',sans-serif;font-size:12px;font-style:italic;color:var(--g3);margin-bottom:11px}
+.rate-modal-desc{font-family:'DM Sans',sans-serif;font-size:12.5px;color:var(--g2);line-height:1.7;border-left:3px solid var(--pink2);padding-left:11px;margin-bottom:16px}
+.comm-stats-row{display:flex;gap:16px;margin-bottom:16px;padding:12px 14px;background:var(--pink);border-radius:8px;align-items:center}
+.comm-stat{display:flex;flex-direction:column;align-items:center;flex:1}
+.comm-stat-n{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--red);line-height:1}
+.comm-stat-l{font-family:'DM Sans',sans-serif;font-size:10px;color:var(--g3);margin-top:2px}
+.comm-stat-sep{width:1px;height:32px;background:var(--rose);flex-shrink:0}
+.rate-hr{height:1px;background:var(--border);margin:0 0 16px}
+.your-rating-hd{font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;color:var(--g3);margin-bottom:10px}
+.slider-display{text-align:center;margin-bottom:7px}
+.slider-num{font-family:'Playfair Display',serif;font-size:58px;font-weight:700;color:var(--g1);line-height:1}
+.slider-word{font-family:'DM Sans',sans-serif;font-size:12px;font-style:italic;color:var(--red);min-height:17px}
+input[type=range].rng{-webkit-appearance:none;appearance:none;width:100%;height:3px;outline:none;cursor:pointer;border-radius:2px;background:linear-gradient(to right,var(--red) 50%,var(--border) 50%);margin:11px 0}
+input[type=range].rng::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:19px;height:19px;border-radius:50%;background:var(--white);border:2.5px solid var(--red);cursor:pointer;box-shadow:0 2px 5px rgba(192,57,43,.28);transition:transform .1s}
+input[type=range].rng::-webkit-slider-thumb:hover{transform:scale(1.2)}
+.slider-ends{display:flex;justify-content:space-between;font-family:'DM Sans',sans-serif;font-size:10px;color:var(--g4)}
+.login-notice{background:var(--pink);border:1px solid var(--rose);border-radius:8px;padding:8px 11px;margin-bottom:12px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--red);line-height:1.5}
+.login-notice a{color:var(--red);cursor:pointer;font-weight:500;text-decoration:underline}
+.submit-btn{width:100%;padding:11px;margin-top:14px;background:var(--red);color:white;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;transition:background .12s;border-radius:8px}
+.submit-btn:hover{background:var(--red2)}
+.submit-btn.rated{background:#2E7D5E}
+.add-modal{background:var(--white);border-radius:12px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.14);animation:popin .2s ease}
+.add-hd{padding:20px 22px 16px;border-bottom:1px solid var(--border);position:relative}
+.add-hd-title{font-family:'DM Serif Display',serif;font-size:20px;color:var(--g1)}
+.add-hd-sub{font-family:'DM Sans',sans-serif;font-size:12px;color:var(--g3);margin-top:3px}
+.add-body{padding:18px 22px 22px}
+.form-row{margin-bottom:13px}
+.form-row.two{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.form-label span{color:var(--red)}
+.form-footer{display:flex;gap:8px;justify-content:flex-end;padding-top:13px;border-top:1px solid var(--border)}
+.btn-cancel{background:none;border:1px solid var(--border);padding:8px 16px;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:var(--g3);transition:all .12s}
+.btn-cancel:hover{border-color:var(--g1);color:var(--g1)}
+.btn-save{background:var(--red);color:white;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;transition:background .12s}
+.btn-save:hover{background:var(--red2)}
+.user-chip{display:flex;align-items:center;gap:7px;background:var(--g6);border:1px solid var(--border);padding:5px 11px;border-radius:20px}
+.user-avatar{width:19px;height:19px;border-radius:50%;background:var(--red);color:white;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-size:10px;font-weight:700}
+.user-name-chip{font-family:'DM Sans',sans-serif;font-size:12px;color:var(--g1)}
+.logout-btn{background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:11px;color:var(--g4);text-decoration:underline;transition:color .12s}
+.logout-btn:hover{color:var(--red)}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--g1);color:white;padding:9px 18px;border-radius:20px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;z-index:600;animation:tin .2s ease,tout .2s 2.6s ease forwards;white-space:nowrap}
+@keyframes tin{from{opacity:0;transform:translateX(-50%) translateY(5px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@keyframes tout{to{opacity:0;transform:translateX(-50%) translateY(5px)}}
+.empty{text-align:center;padding:60px 40px;font-family:'Playfair Display',serif;font-size:17px;color:var(--g4)}
 
-.leaflet-popup-content-wrapper {
-  border-radius: 2px !important; padding: 0 !important;
-  box-shadow: 0 4px 20px var(--sh) !important;
-  border: 1px solid var(--border) !important;
-}
-.leaflet-popup-content { margin: 0 !important; width: 200px !important; }
-.pu-body { padding: 12px 14px; }
-.pu-name { font-family: 'Cormorant Garamond', serif; font-size: 16px; color: var(--ink); margin-bottom: 2px; }
-.pu-loc  { font-size: 11px; color: var(--ink-light); margin-bottom: 6px; }
-.pu-score{ font-size: 12px; color: var(--ink-mid); margin-bottom: 8px; }
-.pu-btn  { display: block; width: 100%; background: var(--ink); color: var(--white); border: none; padding: 8px; font-family: 'DM Sans', sans-serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: background .2s; }
-.pu-btn:hover { background: var(--sakura-deep); }
-
-/* RATING MODAL */
-.overlay {
-  display: none; position: fixed; inset: 0; z-index: 300;
-  background: rgba(35,24,16,.55);
-  align-items: center; justify-content: center;
-  padding: 24px;
-}
-.overlay.open { display: flex; }
-
-.modal {
-  background: var(--white); max-width: 540px; width: 100%;
-  max-height: 90vh; overflow-y: auto;
-  border-radius: 2px;
-  box-shadow: 0 20px 60px rgba(35,24,16,.2);
-  animation: modalin .28s ease;
-}
-@keyframes modalin {
-  from { opacity: 0; transform: translateY(24px) scale(.98); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.modal-top {
-  background: var(--cream);
-  padding: 32px 36px 24px;
-  border-bottom: 1px solid var(--border);
-  position: relative;
-}
-.modal-close {
-  position: absolute; top: 16px; right: 16px;
-  background: none; border: 1px solid var(--border);
-  width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
-  color: var(--ink-light); font-size: 16px;
-  display: flex; align-items: center; justify-content: center;
-  transition: all .18s;
-}
-.modal-close:hover { background: var(--ink); border-color: var(--ink); color: var(--white); }
-
-.modal-region-tag { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--ink-light); margin-bottom: 10px; }
-.modal-name {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 30px; font-weight: 300; color: var(--ink); line-height: 1.1;
-  margin-bottom: 6px;
-}
-.modal-sub { font-size: 12px; color: var(--ink-light); line-height: 1.5; }
-.modal-type { font-family: 'Cormorant Garamond', serif; font-size: 14px; font-style: italic; color: var(--ink-mid); margin-top: 8px; }
-
-.modal-body { padding: 28px 36px; }
-.modal-desc {
-  font-size: 13px; color: var(--ink-mid); line-height: 1.75;
-  border-left: 2px solid var(--sakura); padding-left: 14px;
-  margin-bottom: 24px;
-}
-.modal-hr { height: 1px; background: var(--border); margin: 0 0 24px; }
-
-.comm-block {
-  background: var(--cream); padding: 16px 20px; margin-bottom: 24px;
-  display: flex; align-items: center; gap: 20px;
-}
-.comm-score {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 52px; font-weight: 300; color: var(--ink); line-height: 1;
-}
-.comm-score.none { font-size: 24px; color: var(--ink-light); font-family: 'DM Sans', sans-serif; }
-.comm-detail { }
-.comm-line { width: 80px; height: 3px; background: var(--border); margin-bottom: 4px; position: relative; overflow: hidden; }
-.comm-fill { height: 100%; background: var(--sakura-mid); width: 0%; transition: width .6s .2s; }
-.comm-lbl { font-size: 11px; color: var(--ink-light); letter-spacing: 1px; }
-
-.your-section-hd { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--ink-light); margin-bottom: 16px; }
-.slider-big {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 64px; font-weight: 300; color: var(--ink);
-  text-align: center; line-height: 1; margin-bottom: 4px;
-}
-.slider-caption { text-align: center; font-size: 12px; color: var(--sakura-deep); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; min-height: 16px; }
-.slider-track { width: 100%; }
-input[type=range].rng {
-  -webkit-appearance: none; appearance: none;
-  width: 100%; height: 3px;
-  background: var(--border); outline: none; cursor: pointer;
-  border-radius: 2px;
-  background: linear-gradient(to right, var(--sakura-deep) 50%, var(--border) 50%);
-}
-input[type=range].rng::-webkit-slider-thumb {
-  -webkit-appearance: none; appearance: none;
-  width: 20px; height: 20px; border-radius: 50%;
-  background: var(--ink); cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,0,0,.2);
-  transition: transform .15s;
-}
-input[type=range].rng::-webkit-slider-thumb:hover { transform: scale(1.2); }
-.slider-ends { display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-light); margin-top: 6px; letter-spacing: 1px; }
-
-.submit-btn {
-  width: 100%; padding: 14px; margin-top: 20px;
-  background: var(--ink); color: var(--white); border: none; cursor: pointer;
-  font-family: 'DM Sans', sans-serif; font-size: 11px;
-  letter-spacing: 3px; text-transform: uppercase;
-  transition: background .2s; border-radius: 2px;
-}
-.submit-btn:hover { background: var(--sakura-deep); }
-.submit-btn.rated { background: var(--na); }
-
-/* ADD RESTAURANT MODAL */
-.add-modal {
-  background: var(--white); max-width: 580px; width: 100%;
-  max-height: 90vh; overflow-y: auto;
-  border-radius: 2px;
-  box-shadow: 0 20px 60px rgba(35,24,16,.2);
-  animation: modalin .28s ease;
-}
-.add-hd {
-  padding: 28px 36px 20px;
-  border-bottom: 1px solid var(--border);
-  position: relative;
-}
-.add-hd-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 26px; font-weight: 300; color: var(--ink);
-}
-.add-hd-sub { font-size: 12px; color: var(--ink-light); margin-top: 4px; letter-spacing: .5px; }
-.add-body { padding: 28px 36px; }
-
-.form-row { margin-bottom: 18px; }
-.form-row.two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.form-label {
-  display: block; font-size: 10px; letter-spacing: 2px;
-  text-transform: uppercase; color: var(--ink-light);
-  margin-bottom: 6px;
-}
-.form-label span { color: var(--japan); }
-.form-inp, .form-sel, .form-ta {
-  width: 100%; background: var(--cream); border: 1px solid var(--border);
-  padding: 10px 14px; font-family: 'DM Sans', sans-serif; font-size: 13px;
-  color: var(--ink); outline: none; border-radius: 2px;
-  transition: border-color .18s;
-}
-.form-inp:focus, .form-sel:focus, .form-ta:focus { border-color: var(--sakura-mid); background: var(--white); }
-.form-ta { resize: vertical; min-height: 80px; line-height: 1.6; }
-.form-note { font-size: 11px; color: var(--ink-light); margin-top: 4px; line-height: 1.4; }
-.form-footer {
-  display: flex; gap: 10px; justify-content: flex-end;
-  padding-top: 20px; border-top: 1px solid var(--border);
-}
-.btn-cancel {
-  background: none; border: 1px solid var(--border);
-  padding: 10px 22px; border-radius: 2px; cursor: pointer;
-  font-family: 'DM Sans', sans-serif; font-size: 11px;
-  letter-spacing: 2px; text-transform: uppercase;
-  color: var(--ink-mid); transition: all .18s;
-}
-.btn-cancel:hover { border-color: var(--ink-mid); color: var(--ink); }
-.btn-save {
-  background: var(--ink); color: var(--white); border: none;
-  padding: 10px 22px; border-radius: 2px; cursor: pointer;
-  font-family: 'DM Sans', sans-serif; font-size: 11px;
-  letter-spacing: 2px; text-transform: uppercase;
-  transition: background .2s;
-}
-.btn-save:hover { background: var(--sakura-deep); }
-
-/* TOAST */
-.toast {
-  position: fixed; bottom: 28px; left: 50%;
-  transform: translateX(-50%);
-  background: var(--ink); color: var(--white);
-  padding: 11px 24px; border-radius: 2px; font-size: 12px;
-  letter-spacing: 1px; z-index: 400;
-  box-shadow: 0 6px 24px rgba(0,0,0,.2);
-  animation: toastin .25s ease, toastout .25s 2.6s ease forwards;
-  white-space: nowrap;
-}
-@keyframes toastin  { from { opacity:0; transform:translateX(-50%) translateY(14px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
-@keyframes toastout { to   { opacity:0; transform:translateX(-50%) translateY(14px); } }
-
-/* FOOTER */
-footer {
-  background: var(--cream); border-top: 1px solid var(--border);
-  padding: 32px 48px; text-align: center; position: relative; z-index: 1;
-}
-.ft-logo { font-family: 'Noto Serif JP', serif; font-size: 20px; font-weight: 300; color: var(--ink-mid); letter-spacing: 4px; margin-bottom: 6px; }
-.ft-sub { font-size: 11px; color: var(--ink-light); letter-spacing: 2px; }
-
-@media (max-width: 768px) {
-  header { padding: 0 20px; }
-  .hero { padding: 48px 20px 36px; }
-  .hero-title { font-size: 34px; }
-  .filters { padding: 10px 20px; }
-  .grid { grid-template-columns: 1fr; }
-  .header-right .search-field { display: none; }
-  .map-panel { display: none; }
-  .modal-top, .modal-body, .add-hd, .add-body { padding-left: 20px; padding-right: 20px; }
-}
+@media(max-width:900px){.app-layout{grid-template-columns:1fr}.side-panel{display:none}header{padding:0 14px}.search-wrap input{width:120px}.add-btn{display:none}}
 </style>
 </head>
 <body>
 
-<div id="petal-layer"></div>
-
 <header>
-  <a class="logo" onclick="showView('explore')">
+  <a class="logo" onclick="showView('grid')">
+    <span class="logo-text">Sushicho</span>
     <span class="logo-jp">鮨帖</span>
-    <span class="logo-accent"></span>
-    <span class="logo-rom">Sushicho</span>
   </a>
   <nav>
-    <button class="nav-btn active" id="btn-explore" onclick="showView('explore')">Explore</button>
-    <button class="nav-btn" id="btn-map" onclick="showView('map')">Map</button>
+    <button class="nav-btn active" id="btn-grid" onclick="showView('grid')">Browse</button>
+    <button class="nav-btn" id="btn-map"  onclick="showView('map')">Map</button>
   </nav>
-  <div class="header-right">
-    <div class="search-field">
-      <div class="search-icon"></div>
-      <input type="text" placeholder="Search restaurants, cities..." id="search-inp" oninput="onSearch()">
+  <div class="hdr-right">
+    <div class="search-wrap">
+      <span class="search-lbl">Search</span>
+      <input type="text" placeholder="Restaurant, city..." id="search-inp" oninput="onSearch()">
     </div>
-    <button class="add-btn" onclick="openAddModal()">+ Add Restaurant</button>
+    <div id="user-area"></div>
+    <button class="add-btn" onclick="openAddModal()">+ Add</button>
   </div>
 </header>
 
-<div class="hero" id="hero-sec">
-  <div class="hero-bg-kanji">鮨</div>
-  <div class="hero-tag">The Sushi Notebook</div>
-  <h1 class="hero-title">Discover &amp; Rate the World's<br><em>Finest Sushi</em></h1>
-  <div class="hero-jp">世界の鮨を記録する</div>
-  <div class="hero-line"></div>
-  <div class="hero-stats">
-    <div class="stat"><span class="stat-n" id="s-total">47</span><span class="stat-l">Restaurants</span></div>
-    <div class="stat"><span class="stat-n" id="s-rated">0</span><span class="stat-l">Rated by you</span></div>
-    <div class="stat"><span class="stat-n">10</span><span class="stat-l">Cities in Japan</span></div>
-    <div class="stat"><span class="stat-n">16</span><span class="stat-l">Cities in N. America</span></div>
-  </div>
-</div>
-
-<div class="filters" id="filter-bar">
-  <button class="f-btn active" onclick="setFilter('all',this)">All</button>
-  <button class="f-btn" onclick="setFilter('japan',this)">Japan</button>
-  <button class="f-btn" onclick="setFilter('na',this)">North America</button>
-  <div class="f-sep"></div>
-  <button class="f-btn" onclick="setFilter('rated',this)">My Ratings</button>
-  <button class="f-btn" onclick="setFilter('custom',this)">Community Added</button>
-  <select class="sort-sel" onchange="setSort(this.value)">
-    <option value="default">Default order</option>
-    <option value="rhi">Highest rated first</option>
-    <option value="rlo">Lowest rated first</option>
-    <option value="az">Name A to Z</option>
-    <option value="ph">Price high to low</option>
-    <option value="pl">Price low to high</option>
-  </select>
-  <span class="count-label" id="count-lbl"></span>
-</div>
-
-<div id="view-explore">
-  <div class="grid" id="grid"></div>
-  <div class="empty" id="empty-state" style="display:none">
-    <span class="empty-jp">鮨</span>
-    <p>No restaurants found. Try adjusting your search or filters.</p>
-  </div>
-</div>
-
-<div id="view-map">
-  <div id="map-container">
-    <div id="map"></div>
-    <div class="map-panel">
-      <div class="map-panel-hd">All Locations</div>
-      <div id="map-list"></div>
+<div class="app-layout">
+  <div class="content-col">
+    <div class="filters">
+      <button class="f-btn active" onclick="setFilter('all',this)">All</button>
+      <button class="f-btn" onclick="setFilter('japan',this)">Japan</button>
+      <button class="f-btn" onclick="setFilter('na',this)">N. America</button>
+      <div class="f-sep"></div>
+      <button class="f-btn" onclick="setFilter('rated',this)">My Ratings</button>
+      <button class="f-btn" onclick="setFilter('custom',this)">Community</button>
+      <div class="view-toggle">
+        <button class="vt-btn active" id="vt-grid" onclick="switchDisplay('grid')">Grid</button>
+        <button class="vt-btn"        id="vt-map"  onclick="switchDisplay('map')">Map</button>
+      </div>
+      <select class="sort-sel" onchange="setSort(this.value)">
+        <option value="default">Default order</option>
+        <option value="rhi">Highest rated</option>
+        <option value="rlo">Lowest rated</option>
+        <option value="az">Name A–Z</option>
+        <option value="ph">Price $$$$–$</option>
+        <option value="pl">Price $–$$$$</option>
+      </select>
+      <span class="count-lbl" id="count-lbl"></span>
     </div>
-    <div class="map-legend">
-      <div class="leg-row"><div class="leg-dot" style="background:var(--japan)"></div>Japan</div>
-      <div class="leg-row"><div class="leg-dot" style="background:var(--na)"></div>North America</div>
-      <div class="leg-row"><div class="leg-dot" style="background:var(--custom)"></div>Community Added</div>
-    </div>
-  </div>
-</div>
 
-<footer>
-  <div class="ft-logo">鮨帖</div>
-  <div class="ft-sub">Sushicho — Community ratings for the world's finest sushi counters</div>
-</footer>
-
-<!-- Rating Modal -->
-<div class="overlay" id="rate-overlay" onclick="closeIfOutside(event,'rate-overlay')">
-  <div class="modal">
-    <div class="modal-top">
-      <button class="modal-close" onclick="closeModal()">&#215;</button>
-      <div class="modal-region-tag" id="m-tag"></div>
-      <div class="modal-name" id="m-name"></div>
-      <div class="modal-sub" id="m-sub"></div>
-      <div class="modal-type" id="m-type"></div>
+    <div id="view-grid">
+      <div class="grid" id="grid"></div>
+      <div class="empty" id="empty-state" style="display:none">No restaurants found.</div>
     </div>
-    <div class="modal-body">
-      <div class="modal-desc" id="m-desc"></div>
-      <div class="modal-hr"></div>
-      <div class="comm-block">
-        <div class="comm-score none" id="m-comm-score">No ratings</div>
-        <div class="comm-detail">
-          <div class="comm-line"><div class="comm-fill" id="m-comm-fill"></div></div>
-          <div class="comm-lbl" id="m-comm-lbl">Be the first to rate</div>
+
+    <div id="view-map" style="display:none">
+      <div class="map-container" id="map-container">
+        <canvas id="map-canvas"></canvas>
+        <div class="map-tip" id="map-tip">
+          <div class="map-tip-name"   id="tip-name"></div>
+          <div class="map-tip-meta"   id="tip-meta"></div>
+          <div class="map-tip-rating" id="tip-rating"></div>
+          <button class="map-tip-btn" id="tip-btn">Rate this counter</button>
+        </div>
+        <div class="map-controls">
+          <button class="map-ctrl-btn" onclick="mapZoom(1.25)">+</button>
+          <button class="map-ctrl-btn" onclick="mapZoom(0.8)">-</button>
+          <button class="map-ctrl-btn" onclick="mapReset()" style="font-size:10px;letter-spacing:-.3px">Reset</button>
+        </div>
+        <div class="map-legend">
+          <div class="map-legend-item"><div class="legend-dot" style="background:#C0392B"></div>Japan</div>
+          <div class="map-legend-item"><div class="legend-dot" style="background:#1a5c3a"></div>N. America</div>
+          <div class="map-legend-item"><div class="legend-dot" style="background:white;border:1.5px solid #C0392B"></div>Not rated</div>
+          <div class="map-legend-item"><div class="legend-dot" style="background:#C0392B"></div>Rated (score inside)</div>
         </div>
       </div>
-      <div class="your-section-hd">Your Rating</div>
-      <div class="slider-big" id="m-val">5</div>
-      <div class="slider-caption" id="m-cap">Good</div>
+    </div>
+  </div>
+
+  <div class="side-panel">
+    <div class="side-sec">
+      <div class="side-heading">Your <em>Collection</em></div>
+      <div class="stats-row">
+        <div class="stat-mini"><div class="stat-mini-n" id="s-total">47</div><div class="stat-mini-l">Counters</div></div>
+        <div class="stat-mini"><div class="stat-mini-n" id="s-rated">0</div><div class="stat-mini-l">Rated</div></div>
+        <div class="stat-mini"><div class="stat-mini-n" id="s-michelin">26</div><div class="stat-mini-l">Michelin</div></div>
+      </div>
+      <div class="tag-cloud" id="tag-cloud"></div>
+    </div>
+    <div class="side-sec">
+      <div class="side-heading">Recommended <em>for You</em></div>
+      <div id="rec-list"></div>
+    </div>
+    <div class="side-sec" id="top-section" style="display:none">
+      <div class="side-heading">Your <em>Top Rated</em></div>
+      <div id="top-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Auth Modal -->
+<div class="overlay" id="auth-overlay" onclick="closeIfOutside(event,'auth-overlay')">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeAuthModal()">x</button>
+    <div id="auth-inner"></div>
+  </div>
+</div>
+
+<!-- Rate Modal -->
+<div class="overlay" id="rate-overlay" onclick="closeIfOutside(event,'rate-overlay')">
+  <div class="rate-modal">
+    <div class="rate-modal-img" id="m-img-wrap">
+      <div class="rate-modal-grad"></div>
+      <div class="rate-modal-name" id="m-name"></div>
+      <button class="modal-close" onclick="closeModal()" style="position:absolute;top:10px;right:10px">x</button>
+    </div>
+    <div class="rate-modal-body">
+      <div class="rate-modal-loc"  id="m-loc"></div>
+      <div class="rate-modal-type" id="m-type"></div>
+      <div class="rate-modal-desc" id="m-desc"></div>
+      <div class="comm-stats-row"  id="m-comm-stats"></div>
+      <div class="rate-hr"></div>
+      <div id="m-login-notice"></div>
+      <div class="your-rating-hd">Your Rating</div>
+      <div class="slider-display">
+        <div class="slider-num"  id="m-val">5</div>
+        <div class="slider-word" id="m-cap">Decent</div>
+      </div>
       <input type="range" class="rng" id="m-slider" min="1" max="10" value="5" step="1" oninput="onSlider(this.value)">
       <div class="slider-ends"><span>1 — Poor</span><span>10 — Perfect</span></div>
       <button class="submit-btn" id="m-submit" onclick="submitRating()">Submit Rating</button>
@@ -709,495 +328,622 @@ footer {
   </div>
 </div>
 
-<!-- Add Restaurant Modal -->
+<!-- Add Modal -->
 <div class="overlay" id="add-overlay" onclick="closeIfOutside(event,'add-overlay')">
   <div class="add-modal">
     <div class="add-hd">
-      <button class="modal-close" onclick="closeAddModal()">&#215;</button>
+      <button class="modal-close" onclick="closeAddModal()">x</button>
       <div class="add-hd-title">Add a Restaurant</div>
-      <div class="add-hd-sub">Know a great sushi counter not yet listed? Add it to the community database.</div>
+      <div class="add-hd-sub">Know a great sushi counter not yet listed?</div>
     </div>
     <div class="add-body">
       <div class="form-row two">
-        <div>
-          <label class="form-label">Restaurant Name <span>*</span></label>
-          <input class="form-inp" id="f-name" type="text" placeholder="e.g. Sushi Saito">
-        </div>
-        <div>
-          <label class="form-label">City <span>*</span></label>
-          <input class="form-inp" id="f-city" type="text" placeholder="e.g. Tokyo">
-        </div>
+        <div><label class="form-label">Name <span>*</span></label><input class="form-inp" id="f-name" type="text" placeholder="Sushi Saito"></div>
+        <div><label class="form-label">City <span>*</span></label><input class="form-inp" id="f-city" type="text" placeholder="Tokyo"></div>
       </div>
       <div class="form-row two">
-        <div>
-          <label class="form-label">Neighborhood / Area</label>
-          <input class="form-inp" id="f-area" type="text" placeholder="e.g. Ginza">
-        </div>
-        <div>
-          <label class="form-label">Country <span>*</span></label>
+        <div><label class="form-label">Neighborhood</label><input class="form-inp" id="f-area" type="text" placeholder="Ginza"></div>
+        <div><label class="form-label">Country <span>*</span></label>
           <select class="form-sel" id="f-country">
-            <option value="">Select country</option>
-            <option value="Japan">Japan</option>
-            <option value="USA">United States</option>
-            <option value="Canada">Canada</option>
-            <option value="Mexico">Mexico</option>
-            <option value="Other">Other</option>
+            <option value="">Select</option><option value="Japan">Japan</option>
+            <option value="USA">United States</option><option value="Canada">Canada</option>
+            <option value="Mexico">Mexico</option><option value="Other">Other</option>
           </select>
         </div>
       </div>
       <div class="form-row two">
-        <div>
-          <label class="form-label">Type <span>*</span></label>
+        <div><label class="form-label">Type <span>*</span></label>
           <select class="form-sel" id="f-type">
-            <option value="">Select type</option>
-            <option>Edomae Omakase</option>
-            <option>Contemporary Omakase</option>
-            <option>Traditional Japanese</option>
-            <option>Contemporary Japanese</option>
-            <option>Hokkaido Omakase</option>
-            <option>Conveyor Belt</option>
-            <option>Sushi Bar</option>
-            <option>Other</option>
+            <option value="">Select</option><option>Edomae Omakase</option>
+            <option>Contemporary Omakase</option><option>Traditional Japanese</option>
+            <option>Contemporary Japanese</option><option>Hokkaido Omakase</option>
+            <option>Sushi Bar</option><option>Other</option>
           </select>
         </div>
-        <div>
-          <label class="form-label">Price Range <span>*</span></label>
+        <div><label class="form-label">Price <span>*</span></label>
           <select class="form-sel" id="f-price">
-            <option value="">Select price</option>
-            <option>$</option>
-            <option>$$</option>
-            <option>$$$</option>
-            <option>$$$$</option>
+            <option value="">Select</option><option>$</option><option>$$</option><option>$$$</option><option>$$$$</option>
           </select>
         </div>
-      </div>
-      <div class="form-row">
-        <label class="form-label">Michelin Stars</label>
-        <select class="form-sel" id="f-michelin">
-          <option value="0">None</option>
-          <option value="1">1 Star</option>
-          <option value="2">2 Stars</option>
-          <option value="3">3 Stars</option>
-        </select>
-      </div>
-      <div class="form-row">
-        <label class="form-label">Description</label>
-        <textarea class="form-ta" id="f-desc" placeholder="Brief description of what makes this restaurant special..."></textarea>
       </div>
       <div class="form-row two">
-        <div>
-          <label class="form-label">Latitude</label>
-          <input class="form-inp" id="f-lat" type="number" step="any" placeholder="e.g. 35.6741">
-          <div class="form-note">Optional — required for map placement</div>
+        <div><label class="form-label">Michelin Stars</label>
+          <select class="form-sel" id="f-michelin">
+            <option value="0">None</option><option value="1">1 Star</option>
+            <option value="2">2 Stars</option><option value="3">3 Stars</option>
+          </select>
         </div>
-        <div>
-          <label class="form-label">Longitude</label>
-          <input class="form-inp" id="f-lng" type="number" step="any" placeholder="e.g. 139.7641">
-        </div>
+        <div><label class="form-label">Image URL</label><input class="form-inp" id="f-img" type="text" placeholder="https://..."></div>
+      </div>
+      <div class="form-row"><label class="form-label">Description</label><textarea class="form-ta" id="f-desc" placeholder="What makes this counter special..."></textarea></div>
+      <div class="form-row two">
+        <div><label class="form-label">Latitude</label><input class="form-inp" id="f-lat" type="number" step="any" placeholder="35.6741"></div>
+        <div><label class="form-label">Longitude</label><input class="form-inp" id="f-lng" type="number" step="any" placeholder="139.7641"></div>
       </div>
       <div class="form-footer">
         <button class="btn-cancel" onclick="closeAddModal()">Cancel</button>
-        <button class="btn-save" onclick="submitAdd()">Add to Database</button>
+        <button class="btn-save"   onclick="submitAdd()">Add to Database</button>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-// ── DATA ──────────────────────────────────────────────────────────────────────
-const BASE = [
-  // JAPAN — TOKYO
-  {id:1,  name:"Sukiyabashi Jiro",   area:"Ginza",         city:"Tokyo",      country:"Japan",  region:"japan", lat:35.6741, lng:139.7641, type:"Edomae Omakase",      price:"$$$$", m:3,
-   desc:"The world's most famous sushi counter, owned by legendary chef Jiro Ono. Immortalized in film, this ten-seat Ginza counter defined modern omakase for generations. Reservations border on mythical."},
-  {id:2,  name:"Sushi Saito",        area:"Minato",        city:"Tokyo",      country:"Japan",  region:"japan", lat:35.6641, lng:139.7507, type:"Edomae Omakase",      price:"$$$$", m:3,
-   desc:"Widely considered Japan's single greatest sushi experience. Chef Takashi Saito's counter is effectively impossible to book without personal introduction. The shellfish and aged tuna are transcendent."},
-  {id:3,  name:"Harutaka",           area:"Ginza",         city:"Tokyo",      country:"Japan",  region:"japan", lat:35.6727, lng:139.7659, type:"Edomae Omakase",      price:"$$$$", m:3,
-   desc:"Tokyo's sole three-Michelin-star sushi counter for 2024. Chef Harutaka Negishi's conger eel preparation alone justifies the 60,000-yen price. Reservations require calling a month ahead."},
-  {id:4,  name:"Sushi Yoshitake",    area:"Ginza",         city:"Tokyo",      country:"Japan",  region:"japan", lat:35.6728, lng:139.7662, type:"Edomae Omakase",      price:"$$$$", m:3,
-   desc:"Three Michelin stars. Chef Masahiro Yoshitake's rice — balanced with aged red vinegar, every grain deliberate — is perhaps the finest in Tokyo. The aging of fish is meticulous and innovative."},
-  {id:5,  name:"Sushi Sho",          area:"Yotsuya",       city:"Tokyo",      country:"Japan",  region:"japan", lat:35.6866, lng:139.7239, type:"Edomae Omakase",      price:"$$$$", m:2,
-   desc:"A near-mythical counter whose reservations open only on January 1st, selling out within the hour. Chef Keiji Nakazawa's house-cured fish and Edomae techniques are historically important to the craft."},
-  {id:6,  name:"Esaki",              area:"Shibuya",       city:"Tokyo",      country:"Japan",  region:"japan", lat:35.6659, lng:139.7251, type:"Edomae Omakase",      price:"$$$$", m:3,
-   desc:"Three-Michelin-star counter in Shibuya's Hills Aoyama building. Chef Shintaro Esaki's mastery of fish aging and rice seasoning is considered among the finest in the capital."},
-  {id:7,  name:"Hakkoku",            area:"Ginza",         city:"Tokyo",      country:"Japan",  region:"japan", lat:35.6730, lng:139.7650, type:"Edomae Omakase",      price:"$$$$", m:2,
-   desc:"Two Michelin stars. Chef Yu Sugimoto trained under Sushi Sho before opening this refined Ginza counter. The rice — made from three-year aged vinegar — is extraordinary. Intimate eight-seat setting."},
-  {id:8,  name:"Sushi Namba Hibiya", area:"Hibiya",        city:"Tokyo",      country:"Japan",  region:"japan", lat:35.6735, lng:139.7599, type:"Edomae Omakase",      price:"$$$$", m:0,
-   desc:"Chef Hidefumi Namba is one of Japan's most revered shokunin. His Hibiya counter is member-only with a steep joining fee — those fortunate enough to enter encounter some of Tokyo's most precise nigiri."},
-  {id:9,  name:"Sushi Kobayashi",    area:"Ebisu",         city:"Tokyo",      country:"Japan",  region:"japan", lat:35.6472, lng:139.7100, type:"Edomae Omakase",      price:"$$$$", m:2,
-   desc:"The debut counter of Chef Ikuya Kobayashi, who trained for ten years at the legendary Sushi Saito. Tucked on a quiet Ebisu backstreet, already earning two Michelin stars and fierce critical acclaim."},
-  {id:10, name:"Eitaro Sushi",       area:"Ueno",          city:"Tokyo",      country:"Japan",  region:"japan", lat:35.7081, lng:139.7741, type:"Edomae Omakase",      price:"$$$",  m:0,
-   desc:"Master chef has personally sourced from Toyosu Market every morning for nearly forty years. Traditional Edomae style with wild-caught ingredients, aging techniques, and an 8-course omakase in old Ueno."},
-  {id:11, name:"Sushi Ryuzu",        area:"Roppongi",      city:"Tokyo",      country:"Japan",  region:"japan", lat:35.6616, lng:139.7293, type:"Edomae Omakase",      price:"$$$$", m:2,
-   desc:"Two Michelin stars in Roppongi. Chef Ryuichiro Matsuoka trained at the legendary Sushi Kanesaka before establishing this refined counter. Exceptional aged tuna preparations and a strong sake list."},
-  {id:12, name:"Araki",              area:"Akasaka",       city:"Tokyo",      country:"Japan",  region:"japan", lat:35.6738, lng:139.7397, type:"Edomae Omakase",      price:"$$$$", m:3,
-   desc:"Chef Mitsuhiro Araki earned three Michelin stars in Tokyo before famously relocating to London. His Tokyo successor carries the tradition of extraordinary aged fish and house-blended rice vinegar."},
-  // JAPAN — OSAKA / KYOTO / NAGOYA / FUKUOKA
-  {id:13, name:"Sushi Hayata",       area:"Namba",         city:"Osaka",      country:"Japan",  region:"japan", lat:34.6685, lng:135.5013, type:"Edomae Omakase",      price:"$$$",  m:1,
-   desc:"One Michelin star in Osaka's Namba district. Chef Hayata blends Edomae Tokyo tradition with Osaka's kuidaore spirit. The white-fleshed fish from nearby Akashi strait are particularly outstanding."},
-  {id:14, name:"Matsunozushi",       area:"Fushimi",       city:"Kyoto",      country:"Japan",  region:"japan", lat:34.9410, lng:135.7680, type:"Kyoto-Style Sushi",   price:"$$",   m:0,
-   desc:"A century-old Kyoto institution serving pressed and marinated sushi in the traditional Kyoto style. Mackerel saba-zushi and pickled sea bream reflect the region's landlocked sushi heritage beautifully."},
-  {id:15, name:"Sushi Iwa",          area:"Sakae",         city:"Nagoya",     country:"Japan",  region:"japan", lat:35.1710, lng:136.9080, type:"Edomae Omakase",      price:"$$$",  m:1,
-   desc:"One Michelin star in Nagoya's Sakae district. Chef Iwanaga brings Edomae Tokyo training to central Japan, supplementing it with extraordinary freshwater fish and shellfish unique to the Ise Bay region."},
-  {id:16, name:"Sushi Kogetsu",      area:"Tenjin",        city:"Fukuoka",    country:"Japan",  region:"japan", lat:33.5902, lng:130.4017, type:"Kyushumae",           price:"$$$",  m:1,
-   desc:"One Michelin star. Chef Daisuke Hata's signature 'Kyushumae' nigiri technique — drawing on Kyushu's distinct culinary traditions — makes this Fukuoka counter unique in all of Japan."},
-  // JAPAN — HOKKAIDO
-  {id:17, name:"Sushi Tanaka",       area:"Susukino",      city:"Sapporo",    country:"Japan",  region:"japan", lat:43.0618, lng:141.3544, type:"Hokkaido Omakase",    price:"$$$",  m:1,
-   desc:"One Michelin star. Just off Sapporo's Susukino nightlife corridor, Chef Tanaka serves Hokkaido's extraordinary uni, snow crab, and salmon in a counter defined by singular individuality."},
-  {id:18, name:"Sushi Sohei",        area:"Maruyama",      city:"Sapporo",    country:"Japan",  region:"japan", lat:43.0550, lng:141.3280, type:"Hokkaido Omakase",    price:"$$$",  m:1,
-   desc:"One Michelin star in Sapporo's Maruyama district. The chef's international career — including Hawaii — adds rare cosmopolitan flair to Hokkaido's exceptional local seafood. The uni preparations are unmatched."},
-  {id:19, name:"Hakodate Kikuyo",    area:"Morning Market", city:"Hakodate",  country:"Japan",  region:"japan", lat:41.7740, lng:140.7287, type:"Hokkaido Traditional", price:"$$",   m:0,
-   desc:"A beloved institution in Hakodate's legendary morning market. Opened before dawn to serve fishermen and locals, the ikura, sea urchin, and crab are sourced directly from boats arriving overnight."},
-  // JAPAN — KANAZAWA
-  {id:20, name:"Sushi Ikuta",        area:"Katamachi",     city:"Kanazawa",   country:"Japan",  region:"japan", lat:36.5941, lng:136.6256, type:"Hokuriku Omakase",    price:"$$$",  m:1,
-   desc:"One Michelin star. Opened in 2020 by young chef Takeshi Ikuta. Kanazawa's prime location on the Sea of Japan coast produces extraordinary seafood — buri yellowtail and nodoguro black-throat perch shine here."},
-  // NORTH AMERICA — NEW YORK
-  {id:21, name:"Masa",               area:"Columbus Circle",city:"New York",  country:"USA",    region:"na",    lat:40.7695, lng:-73.9826, type:"Edomae Omakase",      price:"$$$$", m:3,
-   desc:"The apex of American sushi. Chef Masayoshi Takayama's counter atop the Time Warner Center costs over $1,000 per person and is worth every cent. The fish is flown from Tsukiji daily, the truffle shaved tableside."},
-  {id:22, name:"Sushi Nakazawa",     area:"West Village",  city:"New York",   country:"USA",    region:"na",    lat:40.7275, lng:-74.0036, type:"Edomae Omakase",      price:"$$$$", m:1,
-   desc:"One Michelin star. Chef Daisuke Nakazawa trained under Jiro Ono for eleven years. His twenty-piece omakase in the West Village is among the most celebrated in North America."},
-  {id:23, name:"Sushi Yasuda",       area:"Midtown",       city:"New York",   country:"USA",    region:"na",    lat:40.7530, lng:-73.9748, type:"Traditional Omakase", price:"$$$",  m:1,
-   desc:"One Michelin star near Grand Central. Chef Naomichi Yasuda is one of New York's founding sushi masters. His rice — served at body temperature, lightly vinegared — remains an NYC benchmark."},
-  {id:24, name:"Sushi of Gari",      area:"Upper East Side",city:"New York",  country:"USA",    region:"na",    lat:35.6741, lng:139.7641, type:"Contemporary Japanese",price:"$$$", m:1,
-   desc:"One Michelin star. Chef Masatoshi Gari pioneered creative toppings on nigiri — the warm albacore with caramelized onion and the salmon with creamy tofu are New York icons."},
-  {id:25, name:"Blue Ribbon Sushi",  area:"SoHo",          city:"New York",   country:"USA",    region:"na",    lat:40.7244, lng:-74.0027, type:"Contemporary Japanese",price:"$$$",  m:0,
-   desc:"An NYC institution since 1995. Blue Ribbon bridges Japanese tradition with New York vitality. The late-night omakase and remarkable bluefin tuna sourcing have made it a perennial favorite among chefs."},
-  {id:26, name:"Shota",              area:"Williamsburg",  city:"New York",   country:"USA",    region:"na",    lat:40.7128, lng:-73.9672, type:"Edomae Omakase",      price:"$$$$", m:1,
-   desc:"One Michelin star. Chef Cheng Lin's dual-counter in Williamsburg serves 18 remarkable courses. His bluefin is sourced within 10km of southern Japan and the rice vinegar changes course by course."},
-  // NA — CHICAGO
-  {id:27, name:"Kyoten",             area:"Logan Square",  city:"Chicago",    country:"USA",    region:"na",    lat:41.9215, lng:-87.7093, type:"Edomae Omakase",      price:"$$$$", m:2,
-   desc:"Two Michelin stars. Chef Otto Phan left Austin to create Chicago's finest sushi in a nondescript Logan Square space. Extra-large rice grains, aged red vinegar, and luxurious fish flown daily from Japan."},
-  // NA — LOS ANGELES
-  {id:28, name:"Sushi Gen",          area:"Little Tokyo",  city:"Los Angeles",country:"USA",    region:"na",    lat:34.0493, lng:-118.2385, type:"Traditional Japanese",price:"$$",  m:0,
-   desc:"A cult favorite since 1980 in LA's Little Tokyo. The legendary sashimi deluxe lunch is one of the finest values in American dining. Lines stretch around the block on weekday afternoons."},
-  {id:29, name:"Nobu Malibu",        area:"Pacific Coast Hwy",city:"Malibu",  country:"USA",    region:"na",    lat:34.0259, lng:-118.7798, type:"Contemporary Japanese",price:"$$$$",m:0,
-   desc:"Pacific views and Nobu Matsuhisa's perfected classics make this the most scenic Japanese dining in California. The black cod miso, yellowtail jalapeño, and rock shrimp tempura are essential."},
-  // NA — SAN FRANCISCO
-  {id:30, name:"Omakase",            area:"SoMa",          city:"San Francisco",country:"USA",  region:"na",    lat:37.7733, lng:-122.4058, type:"Edomae Omakase",     price:"$$$$", m:1,
-   desc:"One Michelin star. An intimate ten-seat counter in SoMa. Hyper-seasonal Edomae preparations with Northern California sensibility. The sake program curated by the resident sommelier is exceptional."},
-  {id:31, name:"Ju-Ni",              area:"Japantown",     city:"San Francisco",country:"USA",  region:"na",    lat:37.7845, lng:-122.4302, type:"Edomae Omakase",     price:"$$$$", m:1,
-   desc:"One Michelin star. Chef Geoffrey Lee's twelve-seat counter delivers twelve courses of immaculate omakase. His precise Edomae technique, applied to West Coast fish, produces something uniquely Californian."},
-  {id:32, name:"Sushi Ran",          area:"Bridgeway",     city:"Sausalito",  country:"USA",    region:"na",    lat:37.8593, lng:-122.4834, type:"Contemporary Omakase",price:"$$$", m:1,
-   desc:"One Michelin star in Sausalito across the bay from San Francisco. Among the most consistent Japanese restaurants in the country for over three decades. The seasonal omakase showcases Pacific seafood beautifully."},
-  // NA — MIAMI / SOUTHEAST
-  {id:33, name:"Shingo",             area:"Coral Gables",  city:"Miami",      country:"USA",    region:"na",    lat:25.7215, lng:-80.2684, type:"Edomae Omakase",      price:"$$$$", m:1,
-   desc:"One Michelin star. The entire 850-square-foot restaurant was constructed in Kyoto then disassembled and shipped to Florida. Chef Shingo Akikuni's 18-course counter is subtlety and precision incarnate."},
-  {id:34, name:"Ogawa",              area:"Little River",  city:"Miami",      country:"USA",    region:"na",    lat:25.8260, lng:-80.1879, type:"Edomae Omakase",      price:"$$$$", m:1,
-   desc:"One Michelin star. No sign on the building, the address disclosed only to confirmed guests. Chef Masayuki Komatsu tailors every evening's menu to the specific guests arriving. Profoundly authentic."},
-  {id:35, name:"Makoto",             area:"Bal Harbour Shops",city:"Bal Harbour",country:"USA", region:"na",    lat:25.8953, lng:-80.1231, type:"Contemporary Omakase",price:"$$$$", m:0,
-   desc:"Chef Makoto Okuwa's flagship in Bal Harbour. Exquisite Japanese craftsmanship in a luxury shopping setting. The omakase showcases seasonal fish with immaculate technique and genuine warmth."},
-  // NA — WASHINGTON DC
-  {id:36, name:"Sushi Taro",         area:"Dupont Circle", city:"Washington DC",country:"USA",  region:"na",    lat:38.9157, lng:-77.0367, type:"Traditional Omakase", price:"$$$", m:1,
-   desc:"One Michelin star. DC's most revered Japanese restaurant for decades. Chef Nobu Yamazaki sources daily from Tsukiji and his omakase reflects deep respect for seasonal Edomae traditions."},
-  // NA — PHILADELPHIA
-  {id:37, name:"Morimoto",           area:"Old City",      city:"Philadelphia",country:"USA",   region:"na",    lat:39.9457, lng:-75.1498, type:"Contemporary Japanese",price:"$$$", m:0,
-   desc:"Iron Chef Masaharu Morimoto's flagship restaurant in a stunning Stephen Starr–designed space. Bold, theatrical presentations and a memorable omakase make this a Philadelphia landmark."},
-  // NA — BOSTON
-  {id:38, name:"O Ya",               area:"Leather District",city:"Boston",   country:"USA",    region:"na",    lat:42.3522, lng:-71.0570, type:"Contemporary Omakase",price:"$$$$", m:0,
-   desc:"Chef Tim Cushman's innovative omakase blends Edomae tradition with New England ingredients and Japanese-inspired flavor combinations. The wagyu nigiri with foie gras and yuzu is the city's most iconic bite."},
-  {id:39, name:"Uni",                area:"Back Bay",      city:"Boston",     country:"USA",    region:"na",    lat:42.3510, lng:-71.0820, type:"Contemporary Japanese",price:"$$$",  m:0,
-   desc:"The izakaya above Clio, helmed by Tony Messina. Creative Japanese small plates and exceptional sushi in an intimate setting. The live sea urchin served in its shell is justifiably famous."},
-  // NA — LAS VEGAS
-  {id:40, name:"Kabuto",             area:"Spring Valley", city:"Las Vegas",  country:"USA",    region:"na",    lat:36.1574, lng:-115.2466, type:"Edomae Omakase",     price:"$$$$", m:0,
-   desc:"Tucked in a Las Vegas strip mall, Kabuto is the city's most serious sushi destination. Chef Ryung Su's omakase uses fish flown directly from Japan. A genuine Edomae counter in the Nevada desert."},
-  {id:41, name:"Nobu Las Vegas",     area:"Caesars Palace",city:"Las Vegas",  country:"USA",    region:"na",    lat:36.1162, lng:-115.1745, type:"Contemporary Japanese",price:"$$$$",m:0,
-   desc:"The Las Vegas flagship of Nobu Matsuhisa's global empire, set within Caesars Palace. The grandest expression of contemporary Japanese cuisine in the city, with an encyclopedic menu and impeccable execution."},
-  // NA — SEATTLE
-  {id:42, name:"Sushi Kashiba",      area:"Pike Place",    city:"Seattle",    country:"USA",    region:"na",    lat:47.6081, lng:-122.3375, type:"Traditional Omakase", price:"$$$", m:0,
-   desc:"Chef Shiro Kashiba, the godfather of Seattle sushi, trained under Jiro Ono and helped introduce Edomae sushi to America in the 1960s. His Pike Place Market counter is a living piece of culinary history."},
-  // NA — CANADA
-  {id:43, name:"Sushi Masaki Saito", area:"Yorkville",     city:"Toronto",    country:"Canada", region:"na",    lat:43.6700, lng:-79.3940, type:"Edomae Omakase",      price:"$$$$", m:2,
-   desc:"Two Michelin stars — the highest-rated Japanese restaurant in Canada. Chef Masaki Saito trained under Sushi Sho's Keiji Nakazawa. His Yorkville counter brings genuine Tokyo-level omakase to Toronto."},
-  {id:44, name:"Nobu Toronto",       area:"Financial District",city:"Toronto",country:"Canada", region:"na",    lat:43.6482, lng:-79.3879, type:"Contemporary Japanese",price:"$$$", m:0,
-   desc:"The long-awaited Toronto outpost of Nobu Matsuhisa's legendary empire. Classic signatures executed with precision in a spectacular waterfront setting at the Four Seasons hotel."},
-  {id:45, name:"Sushi Nishinokaze",  area:"Mile End",      city:"Montreal",   country:"Canada", region:"na",    lat:45.5231, lng:-73.5985, type:"Edomae Omakase",      price:"$$$",  m:0,
-   desc:"Chef Vincent Gee spent a year refining his craft in Japan before reopening in Montreal's Mile End. One of North America's most talked-about new omakase counters. The rice and aging reflect serious study."},
-  {id:46, name:"Tojo's",             area:"Cambie",        city:"Vancouver",  country:"Canada", region:"na",    lat:49.2506, lng:-123.1381, type:"Contemporary Japanese",price:"$$$", m:0,
-   desc:"Chef Hidekazu Tojo is credited with inventing the California roll in Vancouver in the 1970s. His namesake restaurant remains the city's most celebrated Japanese dining destination four decades later."},
-  {id:47, name:"Sushi Kashiba Vancouver",area:"Yaletown",  city:"Vancouver",  country:"Canada", region:"na",    lat:49.2774, lng:-123.1197, type:"Contemporary Omakase",price:"$$$", m:0,
-   desc:"A contemporary omakase counter in Yaletown drawing on Pacific Northwest seafood — wild salmon, Dungeness crab, spot prawns — treated with Japanese precision and simplicity. Exceptional seasonal value."},
+// ── IMAGES ────────────────────────────────────────────────────────────────
+const SUSHI_IMGS=[
+  "https://images.pexels.com/photos/2098085/pexels-photo-2098085.jpeg?auto=compress&cs=tinysrgb&w=600",
+  "https://images.pexels.com/photos/3535383/pexels-photo-3535383.jpeg?auto=compress&cs=tinysrgb&w=600",
+  "https://images.pexels.com/photos/1148086/pexels-photo-1148086.jpeg?auto=compress&cs=tinysrgb&w=600",
+  "https://images.pexels.com/photos/2323398/pexels-photo-2323398.jpeg?auto=compress&cs=tinysrgb&w=600",
+  "https://images.pexels.com/photos/357756/pexels-photo-357756.jpeg?auto=compress&cs=tinysrgb&w=600",
+  "https://images.pexels.com/photos/1907642/pexels-photo-1907642.jpeg?auto=compress&cs=tinysrgb&w=600",
+  "https://images.pexels.com/photos/248444/pexels-photo-248444.jpeg?auto=compress&cs=tinysrgb&w=600",
+  "https://images.pexels.com/photos/2871757/pexels-photo-2871757.jpeg?auto=compress&cs=tinysrgb&w=600",
+  "https://images.pexels.com/photos/2323399/pexels-photo-2323399.jpeg?auto=compress&cs=tinysrgb&w=600",
+  "https://images.pexels.com/photos/3213283/pexels-photo-3213283.jpeg?auto=compress&cs=tinysrgb&w=600",
+  "https://images.pexels.com/photos/2531189/pexels-photo-2531189.jpeg?auto=compress&cs=tinysrgb&w=600",
+  "https://images.pexels.com/photos/3065527/pexels-photo-3065527.jpeg?auto=compress&cs=tinysrgb&w=600",
+];
+function getImgForId(id){return SUSHI_IMGS[(id-1)%SUSHI_IMGS.length];}
+
+// ── COMMUNITY RATINGS ─────────────────────────────────────────────────────
+const COMM={
+  1:[9.4,1842],2:[9.7,934],3:[9.3,1201],4:[9.2,1089],5:[9.5,612],
+  6:[9.1,876],7:[8.9,743],8:[9.0,421],9:[8.8,389],10:[8.2,298],
+  11:[8.7,512],12:[9.0,634],13:[8.4,276],14:[7.6,189],15:[8.1,203],
+  16:[8.3,167],17:[8.6,231],18:[8.5,198],19:[7.9,312],20:[8.2,144],
+  21:[9.2,2341],22:[9.0,1876],23:[8.8,1654],24:[8.6,1432],25:[8.3,1198],
+  26:[8.9,876],27:[9.1,743],28:[8.5,2134],29:[8.4,1876],30:[8.9,654],
+  31:[8.7,598],32:[8.6,876],33:[9.0,432],34:[9.1,387],35:[8.4,543],
+  36:[8.7,765],37:[8.2,987],38:[8.8,654],39:[8.3,543],40:[8.6,432],
+  41:[8.1,876],42:[8.9,765],43:[9.2,543],44:[8.0,432],45:[8.5,234],
+  46:[8.3,654],47:[8.1,345],
+};
+function getCR(id){return COMM[id]||[null,0];}
+function fmtN(n){return n>=1000?(n/1000).toFixed(1).replace('.0','')+'k':n;}
+
+// ── DATA ──────────────────────────────────────────────────────────────────
+const BASE=[
+  {id:1, name:"Sukiyabashi Jiro",      area:"Ginza",            city:"Tokyo",        country:"Japan",  region:"japan",lat:35.6741,lng:139.7641,type:"Edomae Omakase",       price:"$$$$",m:3,desc:"The world's most famous sushi counter, owned by legendary chef Jiro Ono. Immortalized in film, this ten-seat Ginza counter defined modern omakase for generations."},
+  {id:2, name:"Sushi Saito",           area:"Minato",           city:"Tokyo",        country:"Japan",  region:"japan",lat:35.6641,lng:139.7507,type:"Edomae Omakase",       price:"$$$$",m:3,desc:"Widely considered Japan's single greatest sushi experience. Chef Takashi Saito's counter is effectively impossible to book without personal introduction."},
+  {id:3, name:"Harutaka",              area:"Ginza",            city:"Tokyo",        country:"Japan",  region:"japan",lat:35.6727,lng:139.7659,type:"Edomae Omakase",       price:"$$$$",m:3,desc:"Tokyo's three-Michelin-star sushi counter. Chef Harutaka Negishi's conger eel preparation alone justifies the 60,000-yen price."},
+  {id:4, name:"Sushi Yoshitake",       area:"Ginza",            city:"Tokyo",        country:"Japan",  region:"japan",lat:35.6728,lng:139.7662,type:"Edomae Omakase",       price:"$$$$",m:3,desc:"Three Michelin stars. Chef Masahiro Yoshitake's rice — balanced with aged red vinegar — is perhaps the finest in Tokyo."},
+  {id:5, name:"Sushi Sho",             area:"Yotsuya",          city:"Tokyo",        country:"Japan",  region:"japan",lat:35.6866,lng:139.7239,type:"Edomae Omakase",       price:"$$$$",m:2,desc:"A near-mythical counter whose reservations open only on January 1st. Chef Keiji Nakazawa's Edomae techniques are historically important."},
+  {id:6, name:"Esaki",                 area:"Shibuya",          city:"Tokyo",        country:"Japan",  region:"japan",lat:35.6659,lng:139.7251,type:"Edomae Omakase",       price:"$$$$",m:3,desc:"Three-Michelin-star counter in Shibuya. Chef Shintaro Esaki's mastery of fish aging and rice seasoning is among the finest in the capital."},
+  {id:7, name:"Hakkoku",               area:"Ginza",            city:"Tokyo",        country:"Japan",  region:"japan",lat:35.6730,lng:139.7650,type:"Edomae Omakase",       price:"$$$$",m:2,desc:"Two Michelin stars. Chef Yu Sugimoto trained under Sushi Sho. The rice from three-year aged vinegar is extraordinary."},
+  {id:8, name:"Sushi Namba Hibiya",    area:"Hibiya",           city:"Tokyo",        country:"Japan",  region:"japan",lat:35.6735,lng:139.7599,type:"Edomae Omakase",       price:"$$$$",m:0,desc:"Chef Hidefumi Namba is one of Japan's most revered shokunin. His member-only counter delivers some of Tokyo's most precise nigiri."},
+  {id:9, name:"Sushi Kobayashi",       area:"Ebisu",            city:"Tokyo",        country:"Japan",  region:"japan",lat:35.6472,lng:139.7100,type:"Edomae Omakase",       price:"$$$$",m:2,desc:"Chef Ikuya Kobayashi trained for ten years at the legendary Sushi Saito. Already earning two Michelin stars."},
+  {id:10,name:"Eitaro Sushi",          area:"Ueno",             city:"Tokyo",        country:"Japan",  region:"japan",lat:35.7081,lng:139.7741,type:"Edomae Omakase",       price:"$$$", m:0,desc:"Master chef has sourced from Toyosu Market every morning for nearly forty years. Traditional Edomae in old Ueno."},
+  {id:11,name:"Sushi Ryuzu",           area:"Roppongi",         city:"Tokyo",        country:"Japan",  region:"japan",lat:35.6616,lng:139.7293,type:"Edomae Omakase",       price:"$$$$",m:2,desc:"Two Michelin stars. Chef Ryuichiro Matsuoka's exceptional aged tuna preparations."},
+  {id:12,name:"Araki",                 area:"Akasaka",          city:"Tokyo",        country:"Japan",  region:"japan",lat:35.6738,lng:139.7397,type:"Edomae Omakase",       price:"$$$$",m:3,desc:"Chef Mitsuhiro Araki earned three Michelin stars in Tokyo. His successor carries the tradition of extraordinary aged fish."},
+  {id:13,name:"Sushi Hayata",          area:"Namba",            city:"Osaka",        country:"Japan",  region:"japan",lat:34.6685,lng:135.5013,type:"Edomae Omakase",       price:"$$$", m:1,desc:"One Michelin star in Osaka's Namba. White-fleshed fish from the Akashi strait are particularly outstanding."},
+  {id:14,name:"Matsunozushi",          area:"Fushimi",          city:"Kyoto",        country:"Japan",  region:"japan",lat:34.9410,lng:135.7680,type:"Kyoto-Style Sushi",    price:"$$",  m:0,desc:"A century-old Kyoto institution serving pressed and marinated sushi in the traditional style."},
+  {id:15,name:"Sushi Iwa",             area:"Sakae",            city:"Nagoya",       country:"Japan",  region:"japan",lat:35.1710,lng:136.9080,type:"Edomae Omakase",       price:"$$$", m:1,desc:"One Michelin star. Chef Iwanaga brings Edomae Tokyo training to central Japan with extraordinary Ise Bay seafood."},
+  {id:16,name:"Sushi Kogetsu",         area:"Tenjin",           city:"Fukuoka",      country:"Japan",  region:"japan",lat:33.5902,lng:130.4017,type:"Kyushumae",            price:"$$$", m:1,desc:"One Michelin star. Chef Daisuke Hata's Kyushumae nigiri technique makes this Fukuoka counter unique."},
+  {id:17,name:"Sushi Tanaka",          area:"Susukino",         city:"Sapporo",      country:"Japan",  region:"japan",lat:43.0618,lng:141.3544,type:"Hokkaido Omakase",     price:"$$$", m:1,desc:"One Michelin star. Chef Tanaka serves Hokkaido's extraordinary uni, snow crab, and salmon."},
+  {id:18,name:"Sushi Sohei",           area:"Maruyama",         city:"Sapporo",      country:"Japan",  region:"japan",lat:43.0550,lng:141.3280,type:"Hokkaido Omakase",     price:"$$$", m:1,desc:"One Michelin star. International career adds cosmopolitan flair to Hokkaido's exceptional seafood."},
+  {id:19,name:"Hakodate Kikuyo",       area:"Morning Market",   city:"Hakodate",     country:"Japan",  region:"japan",lat:41.7740,lng:140.7287,type:"Hokkaido Traditional",  price:"$$",  m:0,desc:"A beloved institution in Hakodate's legendary morning market. Ikura, sea urchin, and crab sourced from arriving boats."},
+  {id:20,name:"Sushi Ikuta",           area:"Katamachi",        city:"Kanazawa",     country:"Japan",  region:"japan",lat:36.5941,lng:136.6256,type:"Hokuriku Omakase",     price:"$$$", m:1,desc:"One Michelin star. Buri yellowtail and nodoguro black-throat perch shine at this Sea of Japan counter."},
+  {id:21,name:"Masa",                  area:"Columbus Circle",  city:"New York",     country:"USA",    region:"na",   lat:40.7695,lng:-73.9826,type:"Edomae Omakase",       price:"$$$$",m:3,desc:"The apex of American sushi. Chef Masayoshi Takayama's counter costs over $1,000 per person. Fish flown from Tsukiji daily."},
+  {id:22,name:"Sushi Nakazawa",        area:"West Village",     city:"New York",     country:"USA",    region:"na",   lat:40.7275,lng:-74.0036,type:"Edomae Omakase",       price:"$$$$",m:1,desc:"One Michelin star. Chef Daisuke Nakazawa trained under Jiro Ono for eleven years."},
+  {id:23,name:"Sushi Yasuda",          area:"Midtown",          city:"New York",     country:"USA",    region:"na",   lat:40.7530,lng:-73.9748,type:"Traditional Omakase",  price:"$$$", m:1,desc:"One Michelin star near Grand Central. Chef Naomichi Yasuda remains an NYC benchmark."},
+  {id:24,name:"Sushi of Gari",         area:"Upper East Side",  city:"New York",     country:"USA",    region:"na",   lat:40.7744,lng:-73.9597,type:"Contemporary Japanese",price:"$$$", m:1,desc:"One Michelin star. Chef Masatoshi Gari pioneered creative toppings on nigiri."},
+  {id:25,name:"Blue Ribbon Sushi",     area:"SoHo",             city:"New York",     country:"USA",    region:"na",   lat:40.7244,lng:-74.0027,type:"Contemporary Japanese",price:"$$$", m:0,desc:"An NYC institution since 1995. Late-night omakase and remarkable bluefin sourcing are perennial favorites."},
+  {id:26,name:"Shota",                 area:"Williamsburg",     city:"New York",     country:"USA",    region:"na",   lat:40.7128,lng:-73.9672,type:"Edomae Omakase",       price:"$$$$",m:1,desc:"One Michelin star. Chef Cheng Lin's 18-course counter. Bluefin sourced from southern Japan."},
+  {id:27,name:"Kyoten",                area:"Logan Square",     city:"Chicago",      country:"USA",    region:"na",   lat:41.9215,lng:-87.7093,type:"Edomae Omakase",       price:"$$$$",m:2,desc:"Two Michelin stars. Chef Otto Phan creates Chicago's finest sushi. Extra-large rice grains, aged red vinegar."},
+  {id:28,name:"Sushi Gen",             area:"Little Tokyo",     city:"Los Angeles",  country:"USA",    region:"na",   lat:34.0493,lng:-118.2385,type:"Traditional Japanese",price:"$$",  m:0,desc:"A cult favorite since 1980 in LA's Little Tokyo. The legendary sashimi deluxe lunch is one of the finest values in American dining."},
+  {id:29,name:"Nobu Malibu",           area:"Pacific Coast Hwy",city:"Malibu",       country:"USA",    region:"na",   lat:34.0259,lng:-118.7798,type:"Contemporary Japanese",price:"$$$$",m:0,desc:"Pacific views and Nobu Matsuhisa's perfected classics. The black cod miso and yellowtail jalapeño are essential."},
+  {id:30,name:"Omakase",               area:"SoMa",             city:"San Francisco",country:"USA",    region:"na",   lat:37.7733,lng:-122.4058,type:"Edomae Omakase",      price:"$$$$",m:1,desc:"One Michelin star. An intimate ten-seat counter in SoMa. Hyper-seasonal Edomae with Northern California sensibility."},
+  {id:31,name:"Ju-Ni",                 area:"Japantown",        city:"San Francisco",country:"USA",    region:"na",   lat:37.7845,lng:-122.4302,type:"Edomae Omakase",      price:"$$$$",m:1,desc:"One Michelin star. Chef Geoffrey Lee's twelve-seat counter delivers twelve courses of immaculate omakase."},
+  {id:32,name:"Sushi Ran",             area:"Bridgeway",        city:"Sausalito",    country:"USA",    region:"na",   lat:37.8593,lng:-122.4834,type:"Contemporary Omakase",price:"$$$", m:1,desc:"One Michelin star in Sausalito. Among the most consistent Japanese restaurants in the country for three decades."},
+  {id:33,name:"Shingo",                area:"Coral Gables",     city:"Miami",        country:"USA",    region:"na",   lat:25.7215,lng:-80.2684,type:"Edomae Omakase",       price:"$$$$",m:1,desc:"One Michelin star. The entire restaurant was constructed in Kyoto then shipped to Florida. 18-course precision."},
+  {id:34,name:"Ogawa",                 area:"Little River",     city:"Miami",        country:"USA",    region:"na",   lat:25.8260,lng:-80.1879,type:"Edomae Omakase",       price:"$$$$",m:1,desc:"One Michelin star. No sign on the building — address disclosed only to confirmed guests. Profoundly authentic."},
+  {id:35,name:"Makoto",                area:"Bal Harbour",      city:"Bal Harbour",  country:"USA",    region:"na",   lat:25.8953,lng:-80.1231,type:"Contemporary Omakase", price:"$$$$",m:0,desc:"Chef Makoto Okuwa's flagship. Exquisite Japanese craftsmanship with immaculate technique and genuine warmth."},
+  {id:36,name:"Sushi Taro",            area:"Dupont Circle",    city:"Washington DC",country:"USA",    region:"na",   lat:38.9157,lng:-77.0367,type:"Traditional Omakase",  price:"$$$", m:1,desc:"One Michelin star. DC's most revered Japanese restaurant. Chef Nobu Yamazaki sources daily from Tsukiji."},
+  {id:37,name:"Morimoto",              area:"Old City",         city:"Philadelphia", country:"USA",    region:"na",   lat:39.9457,lng:-75.1498,type:"Contemporary Japanese",price:"$$$", m:0,desc:"Iron Chef Masaharu Morimoto's flagship. Bold, theatrical presentations and a memorable omakase."},
+  {id:38,name:"O Ya",                  area:"Leather District", city:"Boston",       country:"USA",    region:"na",   lat:42.3522,lng:-71.0570,type:"Contemporary Omakase", price:"$$$$",m:0,desc:"Chef Tim Cushman's innovative omakase blends Edomae tradition with New England ingredients."},
+  {id:39,name:"Uni",                   area:"Back Bay",         city:"Boston",       country:"USA",    region:"na",   lat:42.3510,lng:-71.0820,type:"Contemporary Japanese",price:"$$$", m:0,desc:"Creative Japanese small plates and exceptional sushi. The live sea urchin served in its shell is justifiably famous."},
+  {id:40,name:"Kabuto",                area:"Spring Valley",    city:"Las Vegas",    country:"USA",    region:"na",   lat:36.1574,lng:-115.2466,type:"Edomae Omakase",       price:"$$$$",m:0,desc:"Tucked in a Las Vegas strip mall — the city's most serious sushi. Fish flown directly from Japan."},
+  {id:41,name:"Nobu Las Vegas",        area:"Caesars Palace",   city:"Las Vegas",    country:"USA",    region:"na",   lat:36.1162,lng:-115.1745,type:"Contemporary Japanese",price:"$$$$",m:0,desc:"Nobu Matsuhisa's Las Vegas flagship at Caesars. The grandest contemporary Japanese dining in the city."},
+  {id:42,name:"Sushi Kashiba",         area:"Pike Place",       city:"Seattle",      country:"USA",    region:"na",   lat:47.6081,lng:-122.3375,type:"Traditional Omakase",  price:"$$$", m:0,desc:"Chef Shiro Kashiba trained under Jiro Ono and introduced Edomae sushi to America in the 1960s."},
+  {id:43,name:"Sushi Masaki Saito",    area:"Yorkville",        city:"Toronto",      country:"Canada", region:"na",   lat:43.6700,lng:-79.3940,type:"Edomae Omakase",       price:"$$$$",m:2,desc:"Two Michelin stars — highest-rated Japanese restaurant in Canada. Chef Masaki Saito trained under Sushi Sho."},
+  {id:44,name:"Nobu Toronto",          area:"Financial District",city:"Toronto",     country:"Canada", region:"na",   lat:43.6482,lng:-79.3879,type:"Contemporary Japanese",price:"$$$", m:0,desc:"Classic Nobu signatures in a spectacular waterfront setting at the Four Seasons hotel."},
+  {id:45,name:"Sushi Nishinokaze",     area:"Mile End",         city:"Montreal",     country:"Canada", region:"na",   lat:45.5231,lng:-73.5985,type:"Edomae Omakase",       price:"$$$", m:0,desc:"One of North America's most talked-about new omakase counters. Chef Vincent Gee spent a year refining in Japan."},
+  {id:46,name:"Tojo's",               area:"Cambie",           city:"Vancouver",    country:"Canada", region:"na",   lat:49.2506,lng:-123.1381,type:"Contemporary Japanese",price:"$$$", m:0,desc:"Chef Hidekazu Tojo credited with inventing the California roll. Vancouver's most celebrated Japanese destination."},
+  {id:47,name:"Sushi Kashiba Vancouver",area:"Yaletown",        city:"Vancouver",    country:"Canada", region:"na",   lat:49.2774,lng:-123.1197,type:"Contemporary Omakase", price:"$$$", m:0,desc:"Pacific Northwest seafood — wild salmon, Dungeness crab, spot prawns — treated with Japanese precision."},
 ];
 
-// ── STORAGE ────────────────────────────────────────────────────────────────
-function getCustom()  { try { return JSON.parse(localStorage.getItem('sc_custom') || '[]'); } catch(e){ return []; } }
-function saveCustom(arr) { localStorage.setItem('sc_custom', JSON.stringify(arr)); }
-function getRatings() { try { return JSON.parse(localStorage.getItem('sc_ratings') || '{}'); } catch(e){ return {}; } }
-function saveRating(id, val) { const r = getRatings(); r[id] = val; localStorage.setItem('sc_ratings', JSON.stringify(r)); }
-function getAvg(id) {
-  const r = getRatings(); return r[id] ? { avg: r[id], count: 1 } : { avg: null, count: 0 };
+const CAPS={1:"Poor",2:"Disappointing",3:"Below Average",4:"Mediocre",5:"Decent",6:"Good",7:"Very Good",8:"Excellent",9:"Outstanding",10:"Perfect"};
+
+// ── HELPERS ───────────────────────────────────────────────────────────────
+function mStars(n){return n?'★'.repeat(n):'';}
+function getImg(r){return r.img||getImgForId(r.id);}
+
+// ── AUTH ──────────────────────────────────────────────────────────────────
+function getUsers(){try{return JSON.parse(localStorage.getItem('sc_users')||'{}');}catch(e){return{};}}
+function saveUsers(u){localStorage.setItem('sc_users',JSON.stringify(u));}
+function getCurrentUser(){try{return JSON.parse(localStorage.getItem('sc_current')||'null');}catch(e){return null;}}
+function setCurrentUser(u){localStorage.setItem('sc_current',JSON.stringify(u));}
+function logoutUser(){localStorage.removeItem('sc_current');}
+function ratingsKey(u){return u?'sc_ratings_'+u:'sc_ratings_guest';}
+function getRatings(){const u=getCurrentUser();try{return JSON.parse(localStorage.getItem(ratingsKey(u))||'{}');}catch(e){return{};}}
+function saveRating(id,val){const u=getCurrentUser();const r=getRatings();r[id]=val;localStorage.setItem(ratingsKey(u),JSON.stringify(r));}
+function getCustom(){try{return JSON.parse(localStorage.getItem('sc_custom')||'[]');}catch(e){return[];}}
+function saveCustom(a){localStorage.setItem('sc_custom',JSON.stringify(a));}
+function allRestaurants(){return[...BASE,...getCustom().map(c=>({...c,region:detectRegion(c.country),isCustom:true}))];}
+function detectRegion(c){if(c==='Japan')return 'japan';if(['USA','Canada','Mexico'].includes(c))return 'na';return 'custom';}
+
+// ── AUTH UI ───────────────────────────────────────────────────────────────
+function renderUserArea(){
+  const u=getCurrentUser();
+  document.getElementById('user-area').innerHTML=u
+    ?`<div class="user-chip"><div class="user-avatar">${u[0].toUpperCase()}</div><span class="user-name-chip">${u}</span><button class="logout-btn" onclick="doLogout()">sign out</button></div>`
+    :`<button class="login-btn" onclick="openLogin()">Sign In</button>`;
 }
-
-// ── ALL RESTAURANTS ────────────────────────────────────────────────────────
-function allRestaurants() {
-  const custom = getCustom().map(c => ({...c, region: detectRegion(c.country), isCustom: true }));
-  return [...BASE, ...custom];
-}
-function detectRegion(country) {
-  if (country === 'Japan') return 'japan';
-  if (['USA','Canada','Mexico'].includes(country)) return 'na';
-  return 'custom';
-}
-
-// ── CAPTIONS ───────────────────────────────────────────────────────────────
-const CAPS = {1:"Poor",2:"Disappointing",3:"Below Average",4:"Mediocre",5:"Decent",6:"Good",7:"Very Good",8:"Excellent",9:"Outstanding",10:"Perfect"};
-
-// ── STATE ──────────────────────────────────────────────────────────────────
-let st = { filter:'all', sort:'default', search:'', activeId:null };
-
-// ── PETALS ─────────────────────────────────────────────────────────────────
-function makePetals() {
-  const layer = document.getElementById('petal-layer');
-  const colors = ['#F5C6CC','#F0B8C0','#EAA8B4','#F8D8DC','#F2CBD0'];
-  for (let i = 0; i < 22; i++) {
-    const p = document.createElement('div');
-    p.className = 'pk';
-    const w = 8 + Math.random() * 8, h = w * 0.6;
-    p.style.cssText = `
-      left:${Math.random()*100}%;
-      width:${w}px; height:${h}px;
-      background:${colors[Math.floor(Math.random()*colors.length)]};
-      border-radius:50% 0 50% 0;
-      animation-duration:${10+Math.random()*14}s;
-      animation-delay:${Math.random()*20}s;
-      transform:rotate(${Math.random()*360}deg);
-    `;
-    layer.appendChild(p);
+function openLogin(){showAuthPanel('login');document.getElementById('auth-overlay').classList.add('open');document.body.style.overflow='hidden';}
+function openRegister(){showAuthPanel('register');}
+function closeAuthModal(){document.getElementById('auth-overlay').classList.remove('open');document.body.style.overflow='';}
+function showAuthPanel(mode){
+  const inner=document.getElementById('auth-inner');
+  if(mode==='login'){
+    inner.innerHTML=`<div class="modal-header"><div class="modal-title">Welcome back</div><div class="modal-sub">Sign in to save your ratings</div></div>
+    <div class="modal-body">
+      <div class="form-field"><label class="form-label">Username</label><input class="form-inp" id="au-user" type="text" placeholder="your name" autocomplete="username"></div>
+      <div class="form-field"><label class="form-label">Password</label><input class="form-inp" id="au-pass" type="password" placeholder="..." autocomplete="current-password"></div>
+      <div id="au-err" style="color:var(--red);font-family:'DM Sans',sans-serif;font-size:12px;min-height:16px;margin-bottom:4px"></div>
+      <button class="btn-primary" onclick="doLogin()">Sign In</button>
+      <div class="modal-switch">No account? <a onclick="openRegister()">Create one</a></div>
+    </div>`;
+    setTimeout(()=>document.getElementById('au-user')?.focus(),80);
+  } else {
+    inner.innerHTML=`<div class="modal-header"><div class="modal-title">Create account</div><div class="modal-sub">Ratings saved per account</div></div>
+    <div class="modal-body">
+      <div class="form-field"><label class="form-label">Username</label><input class="form-inp" id="au-user" type="text" placeholder="sushi_lover" autocomplete="username"></div>
+      <div class="form-field"><label class="form-label">Password</label><input class="form-inp" id="au-pass" type="password" placeholder="..." autocomplete="new-password"></div>
+      <div class="form-field"><label class="form-label">Confirm Password</label><input class="form-inp" id="au-pass2" type="password" placeholder="..." autocomplete="new-password"></div>
+      <div id="au-err" style="color:var(--red);font-family:'DM Sans',sans-serif;font-size:12px;min-height:16px;margin-bottom:4px"></div>
+      <button class="btn-primary" onclick="doRegister()">Create Account</button>
+      <div class="modal-switch">Have one? <a onclick="showAuthPanel('login')">Sign in</a></div>
+    </div>`;
+    setTimeout(()=>document.getElementById('au-user')?.focus(),80);
   }
 }
-
-// ── MICHELIN DOTS ──────────────────────────────────────────────────────────
-function mDots(n) {
-  if (!n) return '';
-  return `<div class="michelin-dots"><span class="m-label">M</span>${'<div class="m-dot"></div>'.repeat(n)}</div>`;
+function doLogin(){
+  const user=document.getElementById('au-user').value.trim(),pass=document.getElementById('au-pass').value,err=document.getElementById('au-err'),users=getUsers();
+  if(!user||!pass){err.textContent='Please fill in all fields.';return;}
+  if(!users[user]||users[user]!==pass){err.textContent='Invalid username or password.';return;}
+  setCurrentUser(user);closeAuthModal();renderUserArea();renderCards();renderSidePanel();showToast('Welcome back, '+user+'!');
 }
+function doRegister(){
+  const user=document.getElementById('au-user').value.trim(),pass=document.getElementById('au-pass').value,pass2=document.getElementById('au-pass2').value,err=document.getElementById('au-err'),users=getUsers();
+  if(!user||!pass){err.textContent='Please fill in all fields.';return;}
+  if(pass!==pass2){err.textContent='Passwords do not match.';return;}
+  if(pass.length<4){err.textContent='Password too short (min 4 chars).';return;}
+  if(users[user]){err.textContent='Username already taken.';return;}
+  users[user]=pass;saveUsers(users);setCurrentUser(user);closeAuthModal();renderUserArea();renderCards();renderSidePanel();showToast('Welcome, '+user+'!');
+}
+function doLogout(){logoutUser();renderUserArea();renderCards();renderSidePanel();showToast('Signed out.');}
 
-// ── RENDER CARDS ───────────────────────────────────────────────────────────
-function getFiltered() {
-  const rats = getRatings();
-  let list = allRestaurants();
-  if (st.filter === 'japan')  list = list.filter(r => r.region === 'japan');
-  if (st.filter === 'na')     list = list.filter(r => r.region === 'na');
-  if (st.filter === 'rated')  list = list.filter(r => rats[r.id]);
-  if (st.filter === 'custom') list = list.filter(r => r.isCustom);
-  const q = st.search.toLowerCase();
-  if (q) list = list.filter(r => [r.name, r.city, r.area, r.country, r.type].join(' ').toLowerCase().includes(q));
-  if (st.sort === 'rhi') list.sort((a,b) => (rats[b.id]||0) - (rats[a.id]||0));
-  if (st.sort === 'rlo') list.sort((a,b) => (rats[a.id]||0) - (rats[b.id]||0));
-  if (st.sort === 'az')  list.sort((a,b) => a.name.localeCompare(b.name));
-  if (st.sort === 'ph')  list.sort((a,b) => b.price.length - a.price.length);
-  if (st.sort === 'pl')  list.sort((a,b) => a.price.length - b.price.length);
+// ── STATE ─────────────────────────────────────────────────────────────────
+let st={filter:'all',sort:'default',search:'',activeId:null,display:'grid'};
+
+function getFiltered(){
+  const rats=getRatings();let list=allRestaurants();
+  if(st.filter==='japan') list=list.filter(r=>r.region==='japan');
+  if(st.filter==='na')    list=list.filter(r=>r.region==='na');
+  if(st.filter==='rated') list=list.filter(r=>rats[r.id]);
+  if(st.filter==='custom')list=list.filter(r=>r.isCustom);
+  const q=st.search.toLowerCase();
+  if(q)list=list.filter(r=>[r.name,r.city,r.area,r.country,r.type].join(' ').toLowerCase().includes(q));
+  if(st.sort==='rhi')list.sort((a,b)=>(rats[b.id]||0)-(rats[a.id]||0));
+  if(st.sort==='rlo')list.sort((a,b)=>(rats[a.id]||0)-(rats[b.id]||0));
+  if(st.sort==='az') list.sort((a,b)=>a.name.localeCompare(b.name));
+  if(st.sort==='ph') list.sort((a,b)=>b.price.length-a.price.length);
+  if(st.sort==='pl') list.sort((a,b)=>a.price.length-b.price.length);
   return list;
 }
 
-function renderCards() {
-  const list = getFiltered();
-  const rats = getRatings();
-  const grid = document.getElementById('grid');
-  const emp  = document.getElementById('empty-state');
-  const all  = allRestaurants();
-
-  document.getElementById('s-total').textContent = all.length;
-  document.getElementById('s-rated').textContent = Object.keys(rats).length;
-  document.getElementById('count-lbl').textContent = list.length + ' shown';
-
-  if (!list.length) { grid.innerHTML = ''; emp.style.display = 'block'; return; }
-  emp.style.display = 'none';
-
-  grid.innerHTML = list.map((r, i) => {
-    const rat = rats[r.id];
-    const reg = r.isCustom ? 'custom' : r.region;
-    const regionLabel = r.region === 'japan' ? 'Japan' : (r.isCustom ? 'Community Added' : r.country);
-    const ratingHtml = rat
-      ? `<div><div class="rating-val">${rat}<span style="font-size:14px;color:var(--ink-light)"> /10</span></div><div class="rating-sub">Your rating</div></div>`
-      : `<div class="rating-val none">Not yet rated</div>`;
-    return `<div class="card region-${reg}" style="animation-delay:${(i%16)*.035}s" onclick="openModal(${JSON.stringify(r.id)})">
-      <div class="card-meta">
-        <span class="card-region-tag tag-${reg}">${regionLabel} &middot; ${r.price}</span>
-        ${mDots(r.m)}
+// ── RENDER CARDS ──────────────────────────────────────────────────────────
+function renderCards(){
+  const list=getFiltered(),rats=getRatings(),all=allRestaurants();
+  document.getElementById('s-total').textContent=all.length;
+  document.getElementById('s-rated').textContent=Object.keys(rats).length;
+  document.getElementById('s-michelin').textContent=all.filter(r=>r.m>0).length;
+  document.getElementById('count-lbl').textContent=list.length+' shown';
+  const grid=document.getElementById('grid'),emp=document.getElementById('empty-state');
+  if(!list.length){grid.innerHTML='';emp.style.display='block';return;}
+  emp.style.display='none';
+  grid.innerHTML=list.map((r,i)=>{
+    const rat=rats[r.id],reg=r.isCustom?'custom':r.region;
+    const regionLabel=r.isCustom?'Community':(r.region==='japan'?'Japan':r.country);
+    const [cRat,cCount]=getCR(r.id);
+    let ratingHtml;
+    if(rat){
+      ratingHtml=`<div class="rating-block"><span class="rating-num">${rat}</span><span class="rating-denom">/10</span><span class="rating-reviews">your rating</span></div>`;
+    } else if(cRat){
+      ratingHtml=`<div class="rating-block"><span class="rating-num" style="color:var(--g3);font-size:18px">${cRat}</span><span class="rating-denom">/10</span><span class="rating-reviews">${fmtN(cCount)} reviews</span></div>`;
+    } else {
+      ratingHtml=`<span class="rating-unrated">Not rated</span>`;
+    }
+    const barPct=cRat?Math.round((cRat/10)*100):0;
+    return `<div class="card" style="animation-delay:${(i%12)*.028}s" onclick="openModal(${r.id})">
+      <div class="card-img" style="position:relative">
+        <img src="${getImg(r)}" alt="${r.name}" loading="lazy"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="card-img-fallback">鮨</div>
+        <div class="img-region-tag tag-${reg}">${regionLabel}</div>
+        ${r.m?`<div class="michelin-badge">${mStars(r.m)}</div>`:''}
       </div>
-      <div class="card-name">${r.name}</div>
-      <div class="card-loc">${r.area ? r.area + ' &middot; ' : ''}${r.city}</div>
-      <div class="card-type">${r.type}</div>
-      <div class="card-desc">${r.desc}</div>
-      <div class="card-footer">
-        ${ratingHtml}
-        <button class="rate-chip ${rat ? 'rated' : ''}" onclick="event.stopPropagation();openModal(${JSON.stringify(r.id)})">${rat ? 'Update' : 'Rate'}</button>
+      <div class="comm-bar-wrap"><div class="comm-bar" style="width:${barPct}%"></div></div>
+      <div class="card-body">
+        <div class="card-name">${r.name}</div>
+        <div class="card-meta">${r.area?r.area+' · ':''}${r.city}</div>
+        <div class="card-type">${r.type}</div>
+        <div class="card-desc">${r.desc}</div>
+        <div class="card-footer">
+          ${ratingHtml}
+          <div class="card-footer-right">
+            <span class="price-lbl">${r.price}</span>
+            <button class="rate-btn ${rat?'rated':''}" onclick="event.stopPropagation();openModal(${r.id})">${rat?'Rated':'Rate'}</button>
+          </div>
+        </div>
       </div>
     </div>`;
   }).join('');
 }
 
-function setFilter(f, btn) {
-  st.filter = f;
-  document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderCards();
+// ── SIDE PANEL ────────────────────────────────────────────────────────────
+function renderSidePanel(){
+  const rats=getRatings(),all=allRestaurants();
+  const cities=[...new Set(all.map(r=>r.city))].slice(0,12);
+  document.getElementById('tag-cloud').innerHTML=cities.map(c=>
+    `<span class="tag-pill" onclick="document.getElementById('search-inp').value='${c}';st.search='${c}';renderCards()">${c}</span>`
+  ).join('');
+  const unrated=all.filter(r=>r.m>=2&&!rats[r.id]).slice(0,5);
+  document.getElementById('rec-list').innerHTML=unrated.length?unrated.map(r=>{
+    const[cRat,cCount]=getCR(r.id);
+    return`<div class="rec-card" onclick="openModal(${r.id})">
+      <div class="rec-thumb"><img src="${getImg(r)}" loading="lazy" onerror="this.parentNode.textContent='鮨'" alt="${r.name}"></div>
+      <div class="rec-info">
+        <div class="rec-name">${r.name}</div>
+        <div class="rec-meta">${r.city}${r.m?' · '+mStars(r.m):''} ${cRat?'· '+cRat+'/10':''}</div>
+        <div class="rec-reason">Not yet rated by you</div>
+      </div>
+    </div>`;
+  }).join(''):`<div style="font-family:'DM Sans',sans-serif;font-size:12px;color:var(--g4);font-style:italic;padding:8px 0">Rate restaurants to get personalised picks.</div>`;
+  const rated=all.filter(r=>rats[r.id]).sort((a,b)=>rats[b.id]-rats[a.id]).slice(0,5);
+  const topSec=document.getElementById('top-section');
+  if(rated.length){
+    topSec.style.display='';
+    document.getElementById('top-list').innerHTML=rated.map((r,i)=>
+      `<div class="top-item" onclick="openModal(${r.id})">
+        <div class="top-rank">${i+1}</div>
+        <div class="top-name">${r.name}</div>
+        <div class="top-city">${r.city}</div>
+        <div class="top-score">${rats[r.id]}</div>
+      </div>`
+    ).join('');
+  } else {topSec.style.display='none';}
 }
-function setSort(v) { st.sort = v; renderCards(); }
-function onSearch() { st.search = document.getElementById('search-inp').value; renderCards(); }
 
-// ── MODAL ──────────────────────────────────────────────────────────────────
-function openModal(id) {
-  const all = allRestaurants();
-  const r = all.find(x => x.id == id);
-  if (!r) return;
-  st.activeId = id;
-  const rats = getRatings();
-  const rat = rats[id];
-  const reg = r.isCustom ? 'Community Added' : (r.region === 'japan' ? 'Japan' : r.country);
-  document.getElementById('m-tag').textContent = reg + (r.m ? ' \u00B7 Michelin ' + '\u25CF'.repeat(r.m) : '');
-  document.getElementById('m-name').textContent = r.name;
-  document.getElementById('m-sub').textContent = (r.area ? r.area + ' \u00B7 ' : '') + r.city + ' \u00B7 ' + r.price;
-  document.getElementById('m-type').textContent = r.type;
-  document.getElementById('m-desc').textContent = r.desc || '';
-  const commScore = document.getElementById('m-comm-score');
-  const commFill  = document.getElementById('m-comm-fill');
-  const commLbl   = document.getElementById('m-comm-lbl');
-  if (rat) {
-    commScore.textContent = rat + ' / 10'; commScore.classList.remove('none');
-    commFill.style.width = (rat * 10) + '%';
-    commLbl.textContent = '1 rating (yours)';
-  } else {
-    commScore.textContent = 'No ratings'; commScore.classList.add('none');
-    commFill.style.width = '0%';
-    commLbl.textContent = 'Be the first to rate';
+// ── CANVAS MAP ────────────────────────────────────────────────────────────
+// Web Mercator projection
+function mercX(lng,scale,ox){return(lng+180)/360*scale+ox;}
+function mercY(lat,scale,oy){
+  const r=lat*Math.PI/180;
+  return scale*(Math.PI-Math.log(Math.tan(Math.PI/4+r/2)))/(2*Math.PI)+oy;
+}
+
+let MP={scale:0,ox:0,oy:0,drag:false,lx:0,ly:0,hovId:null,tipId:null};
+
+function mapInit(w,h){
+  MP.scale=w*0.95;MP.ox=w*0.025;
+  const clat=30,r=clat*Math.PI/180;
+  MP.oy=h/2-MP.scale*(Math.PI-Math.log(Math.tan(Math.PI/4+r/2)))/(2*Math.PI);
+}
+
+function rXY(r){return{x:mercX(r.lng,MP.scale,MP.ox),y:mercY(r.lat,MP.scale,MP.oy)};}
+
+function drawMap(){
+  const cv=document.getElementById('map-canvas');
+  const mc=document.getElementById('map-container');
+  if(!cv||!mc)return;
+  const w=mc.clientWidth,h=mc.clientHeight;
+  cv.width=w;cv.height=h;
+  const ctx=cv.getContext('2d');
+  ctx.fillStyle='#c8dce8';ctx.fillRect(0,0,w,h);
+  drawLand(ctx);
+  // Graticule
+  ctx.strokeStyle='rgba(255,255,255,0.18)';ctx.lineWidth=0.5;
+  for(let lng=-180;lng<=180;lng+=30){
+    ctx.beginPath();let first=true;
+    for(let lat=-80;lat<=85;lat+=3){
+      const x=mercX(lng,MP.scale,MP.ox),y=mercY(lat,MP.scale,MP.oy);
+      first?ctx.moveTo(x,y):ctx.lineTo(x,y);first=false;
+    }ctx.stroke();
   }
-  const val = rat || 5;
-  document.getElementById('m-slider').value = val;
-  onSlider(val);
-  const btn = document.getElementById('m-submit');
-  if (rat) { btn.textContent = 'Update Rating'; btn.classList.add('rated'); }
-  else { btn.textContent = 'Submit Rating'; btn.classList.remove('rated'); }
-  document.getElementById('rate-overlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function closeModal() {
-  document.getElementById('rate-overlay').classList.remove('open');
-  document.body.style.overflow = '';
-}
-function onSlider(val) {
-  val = parseInt(val);
-  const pct = (val-1)/9*100;
-  document.getElementById('m-val').textContent = val;
-  document.getElementById('m-cap').textContent = CAPS[val] || '';
-  document.getElementById('m-slider').style.background = `linear-gradient(to right,var(--sakura-deep) ${pct}%,var(--border) ${pct}%)`;
-}
-function submitRating() {
-  const val = parseInt(document.getElementById('m-slider').value);
-  saveRating(st.activeId, val);
-  closeModal();
-  renderCards();
-  const all = allRestaurants(); const r = all.find(x=>x.id==st.activeId);
-  showToast((r ? r.name : 'Restaurant') + ' rated ' + val + ' / 10');
-  if (mapInitialized) refreshMapMarkers();
-}
-
-// ── ADD RESTAURANT ─────────────────────────────────────────────────────────
-function openAddModal()  { document.getElementById('add-overlay').classList.add('open'); document.body.style.overflow='hidden'; }
-function closeAddModal() { document.getElementById('add-overlay').classList.remove('open'); document.body.style.overflow=''; }
-
-function submitAdd() {
-  const name    = document.getElementById('f-name').value.trim();
-  const city    = document.getElementById('f-city').value.trim();
-  const country = document.getElementById('f-country').value;
-  const type    = document.getElementById('f-type').value;
-  const price   = document.getElementById('f-price').value;
-  if (!name || !city || !country || !type || !price) { alert('Please fill in all required fields.'); return; }
-  const newR = {
-    id: 'c_' + Date.now(),
-    name, city, country,
-    area:    document.getElementById('f-area').value.trim(),
-    type, price,
-    m:       parseInt(document.getElementById('f-michelin').value) || 0,
-    desc:    document.getElementById('f-desc').value.trim(),
-    lat:     parseFloat(document.getElementById('f-lat').value) || null,
-    lng:     parseFloat(document.getElementById('f-lng').value) || null,
-    isCustom: true,
-  };
-  const list = getCustom(); list.push(newR); saveCustom(list);
-  closeAddModal();
-  ['f-name','f-city','f-area','f-desc','f-lat','f-lng'].forEach(id => document.getElementById(id).value='');
-  ['f-country','f-type','f-price'].forEach(id => document.getElementById(id).value='');
-  document.getElementById('f-michelin').value = '0';
-  renderCards();
-  showToast(name + ' added to the database');
-  if (mapInitialized) refreshMapMarkers();
-}
-
-// ── MAP ────────────────────────────────────────────────────────────────────
-let mapInitialized = false;
-let leafMap = null;
-let mMarkers = {};
-
-function initMap() {
-  if (mapInitialized) return;
-  mapInitialized = true;
-  leafMap = L.map('map').setView([30, -20], 2);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    attribution:'&copy; OpenStreetMap contributors &copy; CARTO', maxZoom:18
-  }).addTo(leafMap);
-  refreshMapMarkers();
-}
-
-function refreshMapMarkers() {
-  if (!leafMap) return;
-  Object.values(mMarkers).forEach(m => m.remove());
-  mMarkers = {};
-  const rats = getRatings();
-  const list = document.getElementById('map-list');
-  list.innerHTML = '';
-  allRestaurants().forEach(r => {
-    if (!r.lat || !r.lng) {
-      const item = document.createElement('div');
-      item.className = 'map-row';
-      const rc = r.isCustom ? '--custom' : (r.region === 'japan' ? '--japan' : '--na');
-      item.innerHTML = `<div class="map-dot" style="background:var(${rc})"></div><div><div class="map-rname">${r.name}</div><div class="map-rcity">${r.city} &mdash; no coords</div></div>`;
-      list.appendChild(item);
-      return;
+  for(let lat=-60;lat<=80;lat+=30){
+    ctx.beginPath();ctx.moveTo(0,mercY(lat,MP.scale,MP.oy));ctx.lineTo(w,mercY(lat,MP.scale,MP.oy));ctx.stroke();
+  }
+  // Dots
+  const rats=getRatings(),list=getFiltered().filter(r=>r.lat&&r.lng);
+  list.forEach(r=>{
+    const{x,y}=rXY(r);
+    if(x<-20||x>w+20||y<-20||y>h+20)return;
+    const rat=rats[r.id],isJ=r.region==='japan',col=isJ?'#C0392B':'#1a5c3a',hov=MP.hovId===r.id;
+    const radius=hov?11:(rat?8:6);
+    ctx.save();
+    if(hov){ctx.shadowColor=col;ctx.shadowBlur=14;}
+    ctx.beginPath();ctx.arc(x,y,radius,0,Math.PI*2);
+    ctx.fillStyle=rat?col:'rgba(255,255,255,0.9)';ctx.fill();
+    ctx.strokeStyle=col;ctx.lineWidth=rat?0:1.8;ctx.stroke();
+    if(rat){
+      ctx.fillStyle='white';ctx.font='bold 7px sans-serif';
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(rat,x,y);
     }
-    const rat = rats[r.id];
-    const color = r.isCustom ? '#7A5C14' : (r.region === 'japan' ? '#C0392B' : '#3A6B4A');
-    const label = rat ? String(rat) : '?';
-    const icon = L.divIcon({
-      html:`<div style="width:28px;height:28px;background:${color};border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 2px 8px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;"><span style="transform:rotate(45deg);color:#fff;font-size:11px;font-weight:600;display:block;margin-top:3px;">${label}</span></div>`,
-      className:'', iconSize:[28,28], iconAnchor:[14,28], popupAnchor:[0,-32]
-    });
-    const score = rat ? `${rat} / 10` : 'Not yet rated';
-    const mk = L.marker([r.lat, r.lng], {icon}).addTo(leafMap);
-    mk.bindPopup(`<div class="pu-body"><div class="pu-name">${r.name}</div><div class="pu-loc">${r.area ? r.area+' \u00B7 ':'' }${r.city}</div><div class="pu-score">${score}</div><button class="pu-btn" onclick="openModal(${JSON.stringify(r.id)})">Rate this restaurant</button></div>`, {maxWidth:220});
-    mMarkers[r.id] = mk;
-    const item = document.createElement('div');
-    item.className = 'map-row';
-    const rc = r.isCustom ? '--custom' : (r.region === 'japan' ? '--japan' : '--na');
-    item.innerHTML = `<div class="map-dot" style="background:var(${rc})"></div><div><div class="map-rname">${r.name}</div><div class="map-rcity">${r.city}</div></div><div class="map-rscore">${rat || '&mdash;'}</div>`;
-    item.onclick = () => { leafMap.setView([r.lat, r.lng], 13); mMarkers[r.id] && mMarkers[r.id].openPopup(); };
-    list.appendChild(item);
+    ctx.restore();
   });
 }
 
-// ── VIEWS ──────────────────────────────────────────────────────────────────
-function showView(v) {
-  document.getElementById('view-explore').style.display = v==='explore' ? 'block' : 'none';
-  document.getElementById('view-map').style.display     = v==='map'     ? 'block' : 'none';
-  document.getElementById('hero-sec').style.display     = v==='explore' ? 'block' : 'none';
-  document.getElementById('filter-bar').style.display   = v==='explore' ? 'flex'  : 'none';
-  document.getElementById('btn-explore').classList.toggle('active', v==='explore');
-  document.getElementById('btn-map').classList.toggle('active', v==='map');
-  if (v === 'map') { setTimeout(() => { initMap(); leafMap && leafMap.invalidateSize(); }, 80); }
+function drawLand(ctx){
+  ctx.fillStyle='#e4ddd0';
+  function poly(pts){
+    ctx.beginPath();
+    pts.forEach(([lng,lat],i)=>{
+      const x=mercX(lng,MP.scale,MP.ox),y=mercY(lat,MP.scale,MP.oy);
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.closePath();ctx.fill();
+    ctx.strokeStyle='rgba(190,175,158,0.5)';ctx.lineWidth=0.4;ctx.stroke();
+  }
+  // Major land masses
+  poly([[-168,72],[-140,70],[-110,72],[-85,65],[-65,68],[-55,50],[-65,44],[-70,42],[-75,35],[-80,25],[-88,16],[-92,18],[-105,20],[-117,32],[-120,37],[-124,49],[-138,59],[-155,60],[-168,60]]);
+  poly([[-73,83],[-25,83],[-18,76],[-20,68],[-43,58],[-65,62],[-73,73]]);
+  poly([[-80,12],[-65,12],[-50,4],[-35,-5],[-35,-20],[-52,-34],[-65,-42],[-68,-56],[-76,-52],[-80,-30],[-82,-4]]);
+  poly([[-10,36],[10,36],[20,38],[30,40],[40,38],[40,46],[30,50],[25,55],[18,60],[10,65],[-2,58],[-8,48]]);
+  poly([[5,57],[8,58],[15,68],[28,70],[30,62],[24,58],[18,58],[12,56],[8,56]]);
+  poly([[-18,15],[0,18],[30,22],[38,12],[42,8],[40,-10],[34,-22],[25,-35],[15,-30],[10,-18],[0,-5]]);
+  poly([[36,38],[42,36],[54,24],[58,22],[56,12],[44,12],[38,14],[34,20],[36,32]]);
+  poly([[30,70],[60,72],[90,75],[120,72],[140,68],[170,66],[175,60],[165,50],[140,42],[120,38],[100,38],[80,42],[70,38],[60,40],[50,46],[40,44],[30,52],[30,60]]);
+  poly([[100,20],[110,18],[118,22],[122,30],[122,40],[120,48],[110,50],[100,44],[95,28]]);
+  poly([[130,32],[132,34],[135,35],[135,33],[132,31]]);
+  poly([[140,38],[142,41],[141,44],[139,42],[139,38]]);
+  poly([[62,22],[72,22],[80,28],[90,24],[86,16],[80,8],[74,8],[68,22]]);
+  poly([[100,8],[105,14],[110,18],[118,22],[112,6],[104,2],[100,4],[98,8]]);
+  poly([[114,-22],[122,-20],[130,-14],[136,-12],[140,-18],[146,-38],[136,-38],[128,-34],[114,-30]]);
+  poly([[172,-36],[176,-40],[174,-44],[170,-46],[170,-42]]);
+  poly([[95,4],[102,2],[106,-6],[112,-8],[116,-6],[114,0],[110,2],[104,2]]);
 }
 
-// ── OVERLAY CLICK OUTSIDE ──────────────────────────────────────────────────
-function closeIfOutside(e, id) { if (e.target.id === id) { if (id==='rate-overlay') closeModal(); else closeAddModal(); } }
-
-// ── TOAST ──────────────────────────────────────────────────────────────────
-function showToast(msg) {
-  document.querySelectorAll('.toast').forEach(t => t.remove());
-  const t = document.createElement('div'); t.className='toast'; t.textContent=msg;
-  document.body.appendChild(t); setTimeout(()=>t.remove(), 3200);
+function hitTest(mx,my){
+  const rats=getRatings(),list=getFiltered().filter(r=>r.lat&&r.lng);
+  let best=null,bestD=999;
+  list.forEach(r=>{
+    const{x,y}=rXY(r);
+    const d=Math.hypot(mx-x,my-y);
+    if(d<Math.max(rats[r.id]?9:7,13)&&d<bestD){best=r;bestD=d;}
+  });
+  return best;
 }
 
-// ── INIT ───────────────────────────────────────────────────────────────────
-makePetals();
-renderCards();
+function showTip(r,mx,my){
+  const tip=document.getElementById('map-tip'),mc=document.getElementById('map-container');
+  const rats=getRatings(),rat=rats[r.id],[cRat,cCount]=getCR(r.id);
+  document.getElementById('tip-name').textContent=r.name;
+  document.getElementById('tip-meta').textContent=[r.area,r.city,r.price,r.m?mStars(r.m)+' Michelin':null].filter(Boolean).join(' · ');
+  const tr=document.getElementById('tip-rating');
+  if(rat)tr.textContent='Your rating: '+rat+'/10 — '+CAPS[rat];
+  else if(cRat)tr.textContent='Community: '+cRat+'/10 ('+fmtN(cCount)+' reviews)';
+  else tr.textContent='Not yet rated';
+  const btn=document.getElementById('tip-btn');
+  btn.textContent=rat?'Update rating':'Rate this counter';
+  btn.onclick=()=>{hideTip();openModal(r.id);};
+  MP.tipId=r.id;
+  tip.style.display='block';
+  const tw=tip.offsetWidth,th=tip.offsetHeight,cw=mc.clientWidth,ch=mc.clientHeight;
+  let tx=mx+16,ty=my-th/2;
+  if(tx+tw>cw-10)tx=mx-tw-16;
+  if(ty<5)ty=5;if(ty+th>ch-5)ty=ch-th-5;
+  tip.style.left=tx+'px';tip.style.top=ty+'px';
+}
+function hideTip(){document.getElementById('map-tip').style.display='none';MP.tipId=null;}
+
+let eventsSetup=false;
+function setupMapEvents(){
+  if(eventsSetup)return;eventsSetup=true;
+  const cv=document.getElementById('map-canvas');
+  cv.addEventListener('mousemove',e=>{
+    const rect=cv.getBoundingClientRect(),mx=e.clientX-rect.left,my=e.clientY-rect.top;
+    if(MP.drag){
+      MP.ox+=e.clientX-MP.lx;MP.oy+=e.clientY-MP.ly;
+      MP.lx=e.clientX;MP.ly=e.clientY;hideTip();drawMap();return;
+    }
+    const hit=hitTest(mx,my);
+    if(hit){
+      cv.style.cursor='pointer';
+      if(MP.hovId!==hit.id){MP.hovId=hit.id;drawMap();}
+      showTip(hit,mx,my);
+    } else {
+      cv.style.cursor='grab';
+      if(MP.hovId!==null){MP.hovId=null;drawMap();}
+      if(MP.tipId)hideTip();
+    }
+  });
+  cv.addEventListener('mousedown',e=>{
+    const rect=cv.getBoundingClientRect(),mx=e.clientX-rect.left,my=e.clientY-rect.top;
+    if(!hitTest(mx,my)){MP.drag=true;MP.lx=e.clientX;MP.ly=e.clientY;cv.style.cursor='grabbing';}
+  });
+  window.addEventListener('mouseup',()=>{MP.drag=false;});
+  cv.addEventListener('click',e=>{
+    const rect=cv.getBoundingClientRect(),hit=hitTest(e.clientX-rect.left,e.clientY-rect.top);
+    if(hit)openModal(hit.id);
+  });
+  cv.addEventListener('wheel',e=>{
+    e.preventDefault();
+    const rect=cv.getBoundingClientRect(),mx=e.clientX-rect.left,my=e.clientY-rect.top;
+    const f=e.deltaY<0?1.12:0.89;
+    MP.ox=(MP.ox-mx)*f+mx;MP.oy=(MP.oy-my)*f+my;MP.scale*=f;hideTip();drawMap();
+  },{passive:false});
+  // Touch
+  let lastD=null;
+  cv.addEventListener('touchstart',e=>{if(e.touches.length===1){MP.drag=true;MP.lx=e.touches[0].clientX;MP.ly=e.touches[0].clientY;}lastD=null;},{passive:true});
+  cv.addEventListener('touchmove',e=>{
+    e.preventDefault();
+    if(e.touches.length===2){
+      const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY,d=Math.hypot(dx,dy);
+      if(lastD){
+        const f=d/lastD,mx=(e.touches[0].clientX+e.touches[1].clientX)/2,my=(e.touches[0].clientY+e.touches[1].clientY)/2;
+        const rect=cv.getBoundingClientRect(),cx=mx-rect.left,cy=my-rect.top;
+        MP.ox=(MP.ox-cx)*f+cx;MP.oy=(MP.oy-cy)*f+cy;MP.scale*=f;drawMap();
+      }lastD=d;
+    } else if(e.touches.length===1&&MP.drag){
+      MP.ox+=e.touches[0].clientX-MP.lx;MP.oy+=e.touches[0].clientY-MP.ly;
+      MP.lx=e.touches[0].clientX;MP.ly=e.touches[0].clientY;drawMap();
+    }
+  },{passive:false});
+  cv.addEventListener('touchend',()=>{MP.drag=false;lastD=null;},{passive:true});
+}
+
+function mapZoom(f){
+  const cv=document.getElementById('map-canvas'),cx=cv.width/2,cy=cv.height/2;
+  MP.ox=(MP.ox-cx)*f+cx;MP.oy=(MP.oy-cy)*f+cy;MP.scale*=f;drawMap();
+}
+function mapReset(){
+  const mc=document.getElementById('map-container');
+  mapInit(mc.clientWidth,mc.clientHeight);drawMap();
+}
+function showMap(){
+  const mc=document.getElementById('map-container');
+  const w=mc.clientWidth||800,h=mc.clientHeight||500;
+  if(!MP.scale)mapInit(w,h);
+  setupMapEvents();drawMap();
+}
+
+// ── DISPLAY SWITCH ────────────────────────────────────────────────────────
+function switchDisplay(mode){
+  st.display=mode;
+  const ge=document.getElementById('view-grid'),me=document.getElementById('view-map');
+  if(mode==='map'){
+    ge.style.display='none';
+    me.style.display='block'; // <--- CHANGED TO 'block'
+    requestAnimationFrame(()=>requestAnimationFrame(showMap));
+  } else {
+    me.style.display='none';
+    ge.style.display='block'; // <--- CHANGED TO 'block'
+  }
+  document.getElementById('vt-grid').classList.toggle('active',mode==='grid');
+  document.getElementById('vt-map').classList.toggle('active',mode==='map');
+  document.getElementById('btn-grid').classList.toggle('active',mode==='grid');
+  document.getElementById('btn-map').classList.toggle('active',mode==='map');
+}
+function showView(v){switchDisplay(v==='map'?'map':'grid');}
+function setFilter(f,btn){
+  st.filter=f;document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  renderCards();if(st.display==='map')drawMap();
+}
+function setSort(v){st.sort=v;renderCards();if(st.display==='map')drawMap();}
+function onSearch(){st.search=document.getElementById('search-inp').value;renderCards();if(st.display==='map')drawMap();}
+
+// ── RATE MODAL ────────────────────────────────────────────────────────────
+function openModal(id){
+  const all=allRestaurants(),r=all.find(x=>x.id==id);
+  if(!r)return;st.activeId=id;
+  const rats=getRatings(),rat=rats[id],[cRat,cCount]=getCR(id);
+  const iw=document.getElementById('m-img-wrap');
+  let img=iw.querySelector('img');
+  if(!img){img=document.createElement('img');img.style.cssText='width:100%;height:100%;object-fit:cover';iw.insertBefore(img,iw.firstChild);}
+  img.src=getImg(r);
+  document.getElementById('m-name').textContent=r.name;
+  document.getElementById('m-loc').textContent=[r.area,r.city,r.country,r.price,r.m?mStars(r.m)+' Michelin':null].filter(Boolean).join(' · ');
+  document.getElementById('m-type').textContent=r.type;
+  document.getElementById('m-desc').textContent=r.desc||'';
+  const ce=document.getElementById('m-comm-stats');
+  if(cRat){
+    ce.style.display='flex';
+    ce.innerHTML=`<div class="comm-stat"><div class="comm-stat-n">${cRat}</div><div class="comm-stat-l">Avg score</div></div>
+      <div class="comm-stat-sep"></div>
+      <div class="comm-stat"><div class="comm-stat-n">${fmtN(cCount)}</div><div class="comm-stat-l">Reviews</div></div>
+      ${r.m?`<div class="comm-stat-sep"></div><div class="comm-stat"><div class="comm-stat-n">${mStars(r.m)}</div><div class="comm-stat-l">Michelin</div></div>`:''}`;
+  } else {ce.style.display='none';}
+  const notice=document.getElementById('m-login-notice');
+  if(!getCurrentUser())notice.innerHTML=`<div class="login-notice"><a onclick="closeModal();openLogin()">Sign in</a> to save your ratings permanently.</div>`;
+  else notice.innerHTML='';
+  const val=rat||5;document.getElementById('m-slider').value=val;onSlider(val);
+  const btn=document.getElementById('m-submit');
+  if(rat){btn.textContent='Update Rating';btn.classList.add('rated');}
+  else{btn.textContent='Submit Rating';btn.classList.remove('rated');}
+  document.getElementById('rate-overlay').classList.add('open');document.body.style.overflow='hidden';
+}
+function closeModal(){document.getElementById('rate-overlay').classList.remove('open');document.body.style.overflow='';}
+function onSlider(val){
+  val=parseInt(val);const pct=(val-1)/9*100;
+  document.getElementById('m-val').textContent=val;
+  document.getElementById('m-cap').textContent=CAPS[val]||'';
+  document.getElementById('m-slider').style.background=`linear-gradient(to right,var(--red) ${pct}%,var(--border) ${pct}%)`;
+}
+function submitRating(){
+  const val=parseInt(document.getElementById('m-slider').value);
+  saveRating(st.activeId,val);closeModal();renderCards();renderSidePanel();
+  if(st.display==='map')drawMap();
+  const r=allRestaurants().find(x=>x.id==st.activeId);
+  showToast((r?r.name:'Restaurant')+' · '+val+'/10'+(getCurrentUser()?'':' · sign in to save'));
+}
+
+// ── ADD MODAL ─────────────────────────────────────────────────────────────
+function openAddModal(){document.getElementById('add-overlay').classList.add('open');document.body.style.overflow='hidden';}
+function closeAddModal(){document.getElementById('add-overlay').classList.remove('open');document.body.style.overflow='';}
+function submitAdd(){
+  const name=document.getElementById('f-name').value.trim(),city=document.getElementById('f-city').value.trim();
+  const country=document.getElementById('f-country').value,type=document.getElementById('f-type').value,price=document.getElementById('f-price').value;
+  if(!name||!city||!country||!type||!price){alert('Please fill in all required fields.');return;}
+  const newR={id:'c_'+Date.now(),name,city,country,area:document.getElementById('f-area').value.trim(),type,price,
+    m:parseInt(document.getElementById('f-michelin').value)||0,desc:document.getElementById('f-desc').value.trim(),
+    img:document.getElementById('f-img').value.trim()||null,
+    lat:parseFloat(document.getElementById('f-lat').value)||null,lng:parseFloat(document.getElementById('f-lng').value)||null,isCustom:true};
+  const list=getCustom();list.push(newR);saveCustom(list);closeAddModal();
+  ['f-name','f-city','f-area','f-desc','f-lat','f-lng','f-img'].forEach(id=>document.getElementById(id).value='');
+  ['f-country','f-type','f-price'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-michelin').value='0';
+  renderCards();renderSidePanel();showToast(name+' added!');
+}
+
+function closeIfOutside(e,id){
+  if(e.target.id===id){if(id==='rate-overlay')closeModal();else if(id==='add-overlay')closeAddModal();else if(id==='auth-overlay')closeAuthModal();}
+}
+function showToast(msg){
+  document.querySelectorAll('.toast').forEach(t=>t.remove());
+  const t=document.createElement('div');t.className='toast';t.textContent=msg;
+  document.body.appendChild(t);setTimeout(()=>t.remove(),3200);
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeModal();closeAddModal();closeAuthModal();}
+  if(e.key==='Enter'){const ao=document.getElementById('auth-overlay');if(ao.classList.contains('open')){if(document.getElementById('au-pass2'))doRegister();else doLogin();}}
+});
+window.addEventListener('resize',()=>{if(st.display==='map')drawMap();});
+
+// INIT
+renderUserArea();renderCards();renderSidePanel();
 </script>
 </body>
 </html>
