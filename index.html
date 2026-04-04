@@ -248,7 +248,7 @@ input[type=range].rng:disabled{opacity:.4;cursor:not-allowed}
       <input type="text" placeholder="Restaurant, city..." id="search-inp" oninput="onSearch()">
     </div>
     <div id="user-area"></div>
-    <button class="settings-btn" onclick="openSettings()" title="API key settings">⚙</button>
+   
     <button class="add-btn" onclick="openAddModal()">+ Add</button>
   </div>
 </header>
@@ -748,7 +748,7 @@ function openModal(id){
   document.getElementById('m-type').textContent=r.type;
   document.getElementById('m-desc').textContent=r.desc||'';
   // Show buttons immediately; show loading dots if key is set, then fetch
-  document.getElementById('m-ext-links').innerHTML=renderExtLinks(r,null,!!getApiKey());
+  document.getElementById('m-ext-links').innerHTML = renderExtLinks(r, null, true);
   fetchExternalRatings(r).then(ratings=>{
     if(ratings!==null&&String(st.activeId)===String(id)){
       document.getElementById('m-ext-links').innerHTML=renderExtLinks(r,ratings,false);
@@ -815,6 +815,12 @@ function closeIfOutside(e,id){if(e.target.id===id){if(id==='rate-overlay')closeM
 function showToast(msg){document.querySelectorAll('.toast').forEach(t=>t.remove());const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3200);}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeAddModal();closeAuthModal();}if(e.key==='Enter'){const ao=document.getElementById('auth-overlay');if(ao.classList.contains('open')){if(document.getElementById('au-pass2'))doRegister();else doLogin();}}});
 window.addEventListener('resize',()=>{if(st.display==='map'&&leafletMap)leafletMap.invalidateSize();});
+function fmtN(n) {
+  if (!n) return '0';
+  if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+  return String(n);
+}
+
 renderUserArea();renderCards();renderSidePanel();
 </script>
 </body>
