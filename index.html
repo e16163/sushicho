@@ -771,6 +771,9 @@ function fmtN(n) {
   if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
   return String(n);
 }
+function getApiKey() {
+  return true; // We return true to allow the fetch to proceed
+}
 
 renderUserArea();renderCards();renderSidePanel();
 </script>
