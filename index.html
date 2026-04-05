@@ -703,7 +703,7 @@ function openModal(id){
   fetchExternalRatings(r).then(ratings=>{
     if(ratings!==null&&String(st.activeId)===String(id)){
       document.getElementById('m-ext-links').innerHTML=renderExtLinks(r,ratings,false);
-    } else if(ratings===null&&String(st.activeId)===String(id)&&getApiKey()){
+    } else if(ratings===null&&String(st.activeId)===String(id)&&true()){
       document.getElementById('m-ext-links').innerHTML=renderExtLinks(r,null,false);
     }
   });
